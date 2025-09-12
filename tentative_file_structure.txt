@@ -1,31 +1,31 @@
-tetris/
-├─ src/
-│  ├─ constants.py           # All numbers/names we reuse (like COLORS, board size, block size)
-│  ├─ figures.py             # The Tetris shapes (I, J, L, O, S, T, Z) and their rotations
-│  ├─ game/
-│  │  ├─ state.py            # Simple labels for game status ("playing", "game over")
-│  │  ├─ piece.py            # Piece = a falling block (type, rotation, color, x/y position)
-│  │  ├─ board.py            # Board = the playing field (grid of rows/columns, line clearing)
-│  │  ├─ services.py         # Helper functions: check collisions, clear full lines
-│  │  └─ game.py             # Game = the "referee" that runs the rules, spawns pieces, freezes them
-│  ├─ view/
-│  │  ├─ input.py            # Reads keyboard events (left, right, rotate, drop) and translates them
-│  │  └─ pygame_renderer.py  # Draws the board, pieces, and text to the screen
-│  ├─ app.py                 # Wires everything together (loop that updates, draws, and listens to input)
-│  └─ __init__.py            # (empty file, just marks folder as a Python package)
-│
-├─ tests/
-│  ├─ test_collision.py      # Makes sure blocks don’t go through walls or each other
-│  ├─ test_lineclear.py      # Makes sure full rows are removed properly
-│  └─ test_piece.py          # Makes sure rotations and positions work correctly
-│
-├─ docs/
-│  ├─ ARCHITECTURE.md        # One-page explanation of how the pieces fit together
-│  ├─ slides-marp/           # Marp slides for class (design & tutorials)
-│  └─ PROGRESS.md            # Weekly notes from team leader (counts, progress, blockers)
-│
-├─ main.py                   # The file you run: starts the game (very short, calls app.py)
-├─ requirements.txt          # List of needed packages (pygame, pytest, etc.)
-├─ .gitignore                # Tells Git which files/folders to ignore (.venv, __pycache__)
-└─ README.md                 # Instructions for setup, running, and who did what
+ase-420-team-project/
+├─ docs/                        # Documentation for humans (not code)
+│  ├─ ARCHITECTURE.md           # Diagram + explanation of design
+│  ├─ PROGRESS.md               # Weekly leader progress reports
+│  └─ slides-marp/              # Marp slides for class (export to PDF)
 
+├─ src/                         # Actual Tetris source code (new design lives here)
+│  ├─ constants.py              # Shared numbers/colors/sizes (no magic numbers)
+│  ├─ figures.py                # All tetromino shapes and rotations
+│  ├─ game/                     # Core game logic ("brains" of Tetris)
+│  │  ├─ board.py               # Board = grid + line clearing
+│  │  ├─ piece.py               # Piece = one tetromino, position + rotation
+│  │  ├─ services.py            # Helper functions: collision, row checks
+│  │  └─ game.py                # Game = referee that ties board + pieces together
+│  └─ view/                     # Input/output ("eyes and hands" of Tetris)
+│     ├─ input.py               # Read keyboard and turn into commands
+│     └─ pygame_renderer.py     # Draw board/pieces on screen
+
+├─ starter_code/                # Original messy prototype for reference only
+│  ├─ tetris_ver1.py            # Provided prototype code
+│  └─ tetris_code_explained.py  # Same code with beginner-friendly comments
+
+├─ tests/                       # Automated tests (run with pytest)
+│  ├─ test_board.py             # Tests for board + line clearing
+│  ├─ test_piece.py             # Tests for piece rotation and movement
+│  ├─ test_collision.py         # Tests for collision detection
+│  └─ test_integration.py       # (Optional) Tests game flow end-to-end
+
+├─ index.html                   # GitHub.io project landing page
+├─ README.md                    # Quick start: how to run, who did what
+└─ tentative_file_structure.txt # Planning notes (can remove later)

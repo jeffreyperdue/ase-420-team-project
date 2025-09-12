@@ -1,0 +1,290 @@
+import pygame
+import random
+
+# ===========================
+# COLORS
+# ===========================
+# These are RGB values (Red, Green, Blue) that define colors.
+# Each value is from 0–255.
+# Colors is a list we use to paint Tetris blocks.
+Colors = [
+    (0, 0, 0),      # Black, not used for blocks
+    (120, 37, 179), # Purple
+    (100, 179, 179),# Teal
+    (80, 34, 22),   # Brown
+    (80, 134, 22),  # Green
+    (180, 34, 22),  # Red
+    (180, 34, 122), # Pink
+]
+
+# Some extra named colors for drawing background/lines
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GRAY  = (128, 128, 128)
+
+# ===========================
+# FIGURES (Tetris shapes)
+# ===========================
+# Each figure is described using a 4x4 mini-grid (16 positions).
+# Example: position = row*4 + column
+# If the number is in the list, that square is filled.
+# Each shape has several rotations.
+Figures = [
+    [[1, 5, 9, 13], [4, 5, 6, 7]],                # I shape (line)
+    [[4, 5, 9, 10], [2, 6, 5, 9]],                # Z shape
+    [[6, 7, 9, 10], [1, 5, 6, 10]],               # S shape
+    [[1, 2, 5, 9], [0, 4, 5, 6],                  # L shape (and its rotations)
+     [1, 5, 9, 8], [4, 5, 6, 10]],
+    [[1, 2, 6, 10], [5, 6, 7, 9],                 # J shape (and its rotations)
+     [2, 6, 10, 11], [3, 5, 6, 7]],
+    [[1, 4, 5, 6], [1, 4, 5, 9],                  # T shape (and its rotations)
+     [4, 5, 6, 9], [1, 5, 6, 9]],
+    [[1, 2, 5, 6]],                               # O shape (square, only 1 rotation)
+]
+
+# Window size in pixels
+size = (400, 500)
+
+# ===========================
+# GAME STATE VARIABLES
+# ===========================
+# These globals hold the current piece, board, and game status.
+
+Type     = 0  # Which figure type is falling
+Color    = 0  # Which color is used
+Rotation = 0  # Which rotation is used
+
+State = "start" # Game state: "start" (playing) or "gameover"
+Field = []      # The grid of placed blocks (filled with numbers for colors)
+
+# Dimensions of the playing grid (set later in initialize())
+Height = 0
+Width  = 0
+
+# Where on the screen to start drawing the board
+StartX = 100
+StartY = 60
+
+# Size of each block (in pixels)
+Tzoom = 20
+
+# Current piece’s position on the grid
+ShiftX = 0  # left/right
+ShiftY = 0  # up/down
+
+# ===========================
+# PIECE CREATION
+# ===========================
+def make_figure(x, y):
+    """Create a new random piece at position (x,y)."""
+    global ShiftX, ShiftY, Type, Color, Rotation
+    ShiftX = x
+    ShiftY = y
+    Type   = random.randint(0, len(Figures) - 1) # pick random shape
+    Color  = random.randint(1, len(Colors) - 1)  # pick random color
+    Rotation = 0                                 # start unrotated
+
+# ===========================
+# COLLISION DETECTION
+# ===========================
+def intersects(image):
+    """Check if the current piece (image) collides with the board or walls."""
+    intersection = False
+    for i in range(4):          # rows in 4x4 mini-grid
+        for j in range(4):      # columns in 4x4 mini-grid
+            if i * 4 + j in image:  # if this square is part of the shape
+                # Check boundaries and if cell is already filled
+                if i + ShiftY > Height - 1 or \
+                   j + ShiftX > Width - 1 or \
+                   j + ShiftX < 0 or \
+                   Field[i + ShiftY][j + ShiftX] > 0:
+                       intersection = True
+    return intersection
+
+# ===========================
+# LINE CLEARING
+# ===========================
+def break_lines():
+    """Remove full rows and shift everything down."""
+    global Field
+    for i in range(1, Height):
+        zeros = 0
+        for j in range(Width):
+            if Field[i][j] == 0:
+                zeros += 1
+        if zeros == 0: # row is full
+            # Shift all rows above down one
+            for k in range(i, 1, -1):
+                for j in range(Width):
+                    Field[k][j] = Field[k - 1][j]
+
+# ===========================
+# FREEZE (lock piece in place)
+# ===========================
+def freeze(image):
+    """Lock the piece into the field once it lands, then spawn a new one."""
+    global Field, State
+    # Place the blocks of the piece into the Field
+    for i in range(4):
+        for j in range(4):
+            if i * 4 + j in image:
+                Field[i + ShiftY][j + ShiftX] = Color
+    break_lines()       # clear any completed lines
+    make_figure(3, 0)   # spawn a new piece at top
+    # If new piece immediately collides, game is over
+    if intersects(Figures[Type][Rotation]):
+        State = "gameover"
+
+# ===========================
+# MOVEMENT
+# ===========================
+def go_space():
+    """Hard drop: move piece straight down until it hits."""
+    global ShiftY
+    while not intersects(Figures[Type][Rotation]):
+        ShiftY += 1
+    ShiftY -= 1
+    freeze(Figures[Type][Rotation])
+
+def go_down():
+    """Soft drop: move piece down by 1 row (gravity)."""
+    global ShiftY
+    ShiftY += 1
+    if intersects(Figures[Type][Rotation]):
+        ShiftY -= 1 
+        freeze(Figures[Type][Rotation])
+
+def go_side(dx):
+    """Move piece left (dx=-1) or right (dx=+1)."""
+    global ShiftX
+    old_x = ShiftX
+    ShiftX += dx
+    if intersects(Figures[Type][Rotation]):
+        ShiftX = old_x  # undo move if collides
+
+def rotate():
+    """Rotate piece clockwise if possible."""
+    global Rotation
+    old_rotation = Rotation
+    Rotation = (Rotation + 1) % len(Figures[Type])
+    if intersects(Figures[Type][Rotation]):
+        Rotation = old_rotation  # undo if collides
+
+# ===========================
+# BOARD SETUP
+# ===========================
+def init_board():
+    """Create an empty playing field."""
+    for i in range(Height):
+        new_line = [0] * Width  # a row of empty cells
+        Field.append(new_line)
+
+# ===========================
+# DRAWING FUNCTIONS
+# ===========================
+def draw_board(screen, x, y, zoom):
+    """Draw the playing field and placed blocks."""
+    screen.fill(WHITE) # clear background
+
+    for i in range(Height):
+        for j in range(Width):
+            # draw grid outline
+            pygame.draw.rect(screen, GRAY,
+                             [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+            # draw filled block if > 0
+            if Field[i][j] > 0:
+                pygame.draw.rect(screen, Colors[Field[i][j]],
+                                 [x + zoom * j + 1, y + zoom * i + 1,
+                                  zoom - 2, zoom - 1])
+
+def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
+    """Draw the current falling piece."""
+    for i in range(4):
+        for j in range(4):
+            p = i * 4 + j
+            if p in image: # if part of shape
+                pygame.draw.rect(screen, Colors[Color],
+                                 [x + zoom * (j + shift_x) + 1,
+                                  y + zoom * (i + shift_y) + 1,
+                                  zoom - 2, zoom - 2])
+
+# ===========================
+# INITIALIZATION
+# ===========================
+def initialize(height, width):
+    """Initialize game state and create empty board."""
+    global Height, Width, Field, State
+    Height = height
+    Width  = width
+    Field  = []
+    State  = "start"
+    init_board()
+
+# ===========================
+# MAIN GAME LOOP
+# ===========================
+def main():
+    # Setup pygame window
+    pygame.init()
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_caption("Tetris")
+    clock = pygame.time.Clock()
+
+    # Game control variables
+    fps = 200           # frames per second (speed)
+    counter = 0
+    pressing_down = False
+
+    # Start game
+    initialize(20, 10)  # 20 rows, 10 columns
+    make_figure(3, 0)   # spawn first piece
+    done = False
+    level = 1
+
+    # Main loop
+    while not done:
+        counter += 1
+        if counter > 100000: # reset counter if too large
+            counter = 0
+            
+        # Gravity: piece falls every few ticks or when holding down key
+        if counter % (fps // 2 // level) == 0 or pressing_down: 
+            if State == "start":
+                go_down()
+
+        # Handle keyboard and quit events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    rotate()
+                if event.key == pygame.K_LEFT:
+                    go_side(-1)
+                if event.key == pygame.K_RIGHT:
+                    go_side(1)
+                if event.key == pygame.K_SPACE:
+                    go_space()
+                if event.key == pygame.K_DOWN:
+                    pressing_down = True
+            if event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
+                pressing_down = False
+                
+        # Draw everything
+        draw_board(screen, StartX, StartY, Tzoom)
+        draw_figure(screen, Figures[Type][Rotation],
+                    StartX, StartY, ShiftX, ShiftY, Tzoom)
+
+        # End game if state says gameover
+        if State == "gameover":
+            done = True
+
+        # Refresh screen
+        pygame.display.flip()
+        clock.tick(fps)
+
+    pygame.quit()
+
+# Run if file is executed directly
+if __name__ == "__main__":
+    main()

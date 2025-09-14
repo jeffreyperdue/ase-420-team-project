@@ -16,13 +16,14 @@ paginate: true
 ## Team Info
 
 **Leader**: Jeffrey Perdue  
-AI Option Assisted (#2)  
 📧 perduej7@nku.edu  
 
 **Members**  
 - Anna Dinius – diniusa1@mymail.nku.edu  
 - Cody King – kingc26@mymail.nku.edu  
 - Owen Newberry – newberryo1@mymail.nku.edu  
+
+All members went with AI Option Assisted (#2)  
 
 ---
 

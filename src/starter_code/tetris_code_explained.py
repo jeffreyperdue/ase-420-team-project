@@ -62,11 +62,10 @@ Color    = 0  # Which color is used
 Rotation = 0  # Which rotation is used
 
 State = "start" # Game state: "start" (playing) or "gameover"
-Field = []      # The grid of placed blocks (filled with numbers for colors)
 
-# Dimensions of the playing grid (set later in initialize())
-Height = 0
-Width  = 0
+# Dimensions of the playing grid
+Height = 20
+Width = 10
 
 # Where on the screen to start drawing the board
 StartX = 100
@@ -78,6 +77,7 @@ Tzoom = 20
 # Current piece’s position on the grid
 ShiftX = 0  # left/right
 ShiftY = 0  # up/down
+
 # Encapsulated Board (created in initialize)
 GameBoard = None
 
@@ -93,9 +93,7 @@ def make_figure(x, y):
     Color  = random.randint(1, len(Colors) - 1)  # pick random color
     Rotation = 0                                 # start unrotated
 
-
 # Board implementation moved to `src/game/board.py`
-
 
 # ===========================
 # COLLISION DETECTION
@@ -104,11 +102,10 @@ def intersects(image):
     """Check if the current piece (image) collides with the board or walls."""
     intersection = False
     # code smell - what is 4? Magic number
-    for i in range(4):
-        for j in range(4):
-            if i * 4 + j in image:
-                # out of bounds
-                # code smell - confusing, why Y is related i and X is related j?
+    for i in range(4):              # rows in 4x4 mini-grid
+        for j in range(4):          # columns in 4x4 mini-grid
+            if i * 4 + j in image: # if this square is part of the shape
+                # Check boundaries and if cell is already filled
                 if GameBoard is None or \
                    (i + ShiftY) >= GameBoard.height or \
                    (j + ShiftX) >= GameBoard.width or \
@@ -116,23 +113,6 @@ def intersects(image):
                    GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
                         intersection = True
     return intersection
-
-
-# ===========================
-# LINE CLEARING
-# ===========================
-def break_lines():
-    # code smell - why is it hard to read code? why make two sub-functions
-    # for i in ...
-    #  is_filled = check_row_filled(...)
-    #  if is_filled:
-    #.   delete_row(...)
-    if GameBoard is not None:
-        GameBoard.clear_full_lines()
-    else:
-        # No board available; nothing to do
-        return
-
 
 # ===========================
 # FREEZE (lock piece in place)
@@ -143,15 +123,18 @@ def freeze(image):
     if GameBoard is None:
         # Nothing to write to
         return
+    
     for i in range(4):
         for j in range(4):
             if i * 4 + j in image:
                 GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
-    break_lines()
-    make_figure(3, 0) 
+    
+    GameBoard.clear_full_lines() # clear any filled lines
+    make_figure(3, 0) # spawn a new piece at top
+
+    # If new piece immediately collides, game is over
     if intersects(Figures[Type][Rotation]):
         State = "gameover"
-
 
 # ===========================
 # MOVEMENT
@@ -189,55 +172,26 @@ def rotate():
         Rotation = old_rotation  # undo if collides
 
 # ===========================
-# BOARD SETUP
-# ===========================
-def init_board():
-    """Create an empty playing field."""
-    # If using GameBoard, clear it. Otherwise build raw Field list.
-    if GameBoard is not None:
-        GameBoard.clear()
-        try:
-            global Field
-            Field = GameBoard._grid
-        except Exception:
-            pass
-        return
-
-    for i in range(Height):
-        new_line = [0] * Width  # a row of empty cells
-        Field.append(new_line)
-
-# ===========================
 # DRAWING FUNCTIONS
 # ===========================
 def draw_board(screen, x, y, zoom):
     """Draw the playing field and placed blocks."""
     screen.fill(WHITE) # clear background
-    # Draw using GameBoard if available, otherwise use legacy globals
-    if GameBoard is not None:
-        for i in range(GameBoard.height):
-            for j in range(GameBoard.width):
-                # draw grid outline
-                pygame.draw.rect(screen, GRAY,
-                                 [x + zoom * j, y + zoom * i, zoom, zoom], 1)
-                # draw filled block if > 0
-                val = GameBoard.cell(i, j)
-                if val > 0:
-                    pygame.draw.rect(screen, Colors[val],
-                                     [x + zoom * j + 1, y + zoom * i + 1,
-                                      zoom - 2, zoom - 1])
-        return
 
-    for i in range(Height):
-        for j in range(Width):
+    # Draw using GameBoard
+    if GameBoard is None:
+        return
+    for i in range(GameBoard.height):
+        for j in range(GameBoard.width):
             # draw grid outline
-            pygame.draw.rect(screen, GRAY,
-                             [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+            pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+            
             # draw filled block if > 0
-            if Field[i][j] > 0:
-                pygame.draw.rect(screen, Colors[Field[i][j]],
-                                 [x + zoom * j + 1, y + zoom * i + 1,
-                                  zoom - 2, zoom - 1])
+            val = GameBoard.cell(i, j)
+            if val > 0:
+                pygame.draw.rect(screen, Colors[val],
+                                    [x + zoom * j + 1, y + zoom * i + 1,
+                                    zoom - 2, zoom - 1])
 
 def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
     """Draw the current falling piece."""
@@ -255,14 +209,15 @@ def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
 # ===========================
 def initialize(height, width):
     """Initialize game state and create empty board."""
-    global Height, Width, Field, State, GameBoard
-    Height = height
-    Width  = width
-    Field  = []
-    State  = "start"
+    global State, GameBoard
+
     # Create an encapsulated GameBoard and initialize it
-    GameBoard = Board(Height, Width)
-    init_board()
+    GameBoard = Board(height, width)
+    
+    # Clear the board to ensure it's empty
+    GameBoard.clear()
+
+    State  = "start"
 
 # ===========================
 # MAIN GAME LOOP
@@ -280,7 +235,7 @@ def main():
     pressing_down = False
 
     # Start game
-    initialize(20, 10)  # 20 rows, 10 columns
+    initialize(Height, Width)  # Height: # of rows, Width: # of columns
     make_figure(3, 0)   # spawn first piece
     done = False
     level = 1

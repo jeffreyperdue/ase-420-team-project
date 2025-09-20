@@ -45,13 +45,21 @@ Rotation = 0
 
 # Game state
 State = "start" # or "gameover"
+
+# Dimensions of the playing grid
+Height = 20
+Width = 10
+
 # Encapsulated board instance (created in initialize)
 GameBoard = None
+
 # StartX/Y position in the screen
 StartX = 100
 StartY= 60
+
 # Block size
 Tzoom = 20 # code smell - bad name, can you guess Tzoom from its name? 
+
 # Shift left/right or up/down
 ShiftX = 0
 ShiftY = 0
@@ -82,30 +90,21 @@ def intersects(image):
                         intersection = True
     return intersection
 
-def break_lines():
-    # code smell - why is it hard to read code? why make two sub-functions
-    # for i in ...
-    #  is_filled = check_row_filled(...)
-    #  if is_filled:
-    #.   delete_row(...)
-    if GameBoard is not None:
-        GameBoard.clear_full_lines()
-    else:
-        # No board available; nothing to do
-        return
-
 def freeze(image):
     # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
     global State, GameBoard
     if GameBoard is None:
         # Nothing to write to
         return
+    
     for i in range(4):
         for j in range(4):
             if i * 4 + j in image:
                 GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
-    break_lines()
-    make_figure(3, 0) 
+    
+    GameBoard.clear_full_lines() # clear any filled lines
+    make_figure(3, 0) # spawn a new piece at top
+    
     if intersects(Figures[Type][Rotation]):
         State = "gameover"
 
@@ -151,32 +150,42 @@ def init_board():
 
 def draw_board(screen, x, y, zoom):
     screen.fill(WHITE)
+
+    # Draw using GameBoard
     if GameBoard is None:
         return
     for i in range(GameBoard.height):
         for j in range(GameBoard.width):
+            # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+            
+            # draw filled block if > 0
             val = GameBoard.cell(i, j)
             if val > 0:
                 pygame.draw.rect(screen, Colors[val],
                                  [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
 
-def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
+def draw_figure(screen, image, startX, startY, shiftX, shiftY, zoom):
     for i in range(4):
         for j in range(4):
             p = i * 4 + j
             if p in image:
                 pygame.draw.rect(screen, Colors[Color],
-                                 [x + zoom * (j + shift_x) + 1,
-                                  y + zoom * (i + shift_y) + 1,
+                                 [startX + zoom * (j + shiftX) + 1,
+                                  startY + zoom * (i + shiftY) + 1,
                                   zoom - 2, zoom - 2])
             
 def initialize(height, width):
     global GameBoard, State
-    GameBoard = Board(height, width)
-    State = "start"
-    init_board()
 
+    # Create an encapsulated GameBoard and initialize it
+    GameBoard = Board(height, width)
+
+    # Clear the board to ensure it's empty
+    GameBoard.clear()
+
+    State = "start"
+    
 def main():
     # Pygame related init
     pygame.init()
@@ -189,7 +198,7 @@ def main():
     counter = 0
     pressing_down = False
 
-    initialize(20, 10) # code smell - what is 20 and 10? Can we use keyword argument? 
+    initialize(Height, Width)  # Height: # of rows, Width: # of columns
     make_figure(3,0)
     done = False
     level = 1
@@ -221,10 +230,10 @@ def main():
             if event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
                 pressing_down = False
                 
-        draw_board(screen = screen, x = StartX, y = StartY, zoom = Tzoom)
+        draw_board(screen, StartX, StartY, Tzoom)
         
         # code smell - how many values duplication Figures[Type][Rotation]
-        draw_figure(screen = screen, image = Figures[Type][Rotation], x = StartX, y = StartY, shift_x = ShiftX, shift_y = ShiftY, zoom = Tzoom)
+        draw_figure(screen, Figures[Type][Rotation], StartX, StartY, ShiftX, ShiftY, Tzoom)
 
         if State == "gameover":
             done = True

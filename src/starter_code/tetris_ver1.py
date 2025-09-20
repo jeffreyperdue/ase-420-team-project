@@ -1,5 +1,13 @@
 import pygame
 import random
+import os
+import sys
+# Import Board class from src/game/board.py
+# Ensure repository root is on sys.path so imports work when running from starter_code
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
+from src.game.board import Board
 
 # Global constants - it's OK as it's read only
 # code smell - why list when tuple (immutable) is OK? Use immutable objects as much as possible
@@ -35,12 +43,10 @@ Type = 0
 Color = 0
 Rotation = 0
 
+# Game state
 State = "start" # or "gameover"
-Field = []
-
-# Tetris block Height and Width
-Height = 0
-Width = 0
+# Encapsulated board instance (created in initialize)
+GameBoard = None
 # StartX/Y position in the screen
 StartX = 100
 StartY= 60
@@ -68,11 +74,12 @@ def intersects(image):
             if i * 4 + j in image:
                 # out of bounds
                 # code smell - confusing, why Y is related i and X is related j?
-                if i + ShiftY > Height - 1 or \
-                   j + ShiftX > Width - 1 or \
-                   j + ShiftX < 0 or \
-                   Field[i + ShiftY][j + ShiftX] > 0:
-                       intersection = True
+                if GameBoard is None or \
+                   (i + ShiftY) >= GameBoard.height or \
+                   (j + ShiftX) >= GameBoard.width or \
+                   (j + ShiftX) < 0 or \
+                   GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
+                        intersection = True
     return intersection
 
 def break_lines():
@@ -81,25 +88,22 @@ def break_lines():
     #  is_filled = check_row_filled(...)
     #  if is_filled:
     #.   delete_row(...)
-    global Field
-    for i in range(1, Height):
-        zeros = 0
-        for j in range(Width):
-            if Field[i][j] == 0:
-                zeros += 1
-        # there is no empty cell
-        if zeros == 0:
-            for k in range(i, 1, -1):
-                for j in range(Width):
-                    Field[k][j] = Field[k - 1][j]
+    if GameBoard is not None:
+        GameBoard.clear_full_lines()
+    else:
+        # No board available; nothing to do
+        return
 
 def freeze(image):
     # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
-    global Field, State
+    global State, GameBoard
+    if GameBoard is None:
+        # Nothing to write to
+        return
     for i in range(4):
         for j in range(4):
             if i * 4 + j in image:
-                Field[i + ShiftY][j + ShiftX] = Color
+                GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
     break_lines()
     make_figure(3, 0) 
     if intersects(Figures[Type][Rotation]):
@@ -138,18 +142,23 @@ def rotate():
         Rotation = old_rotation
         
 def init_board():
-    for i in range(Height):
-        new_line = [0] * Width # polymorphism using * 
-        Field.append(new_line)
+    # Initialize/clear the encapsulated GameBoard
+    if GameBoard is not None:
+        GameBoard.clear()
+    else:
+        # No board to initialize
+        return
 
 def draw_board(screen, x, y, zoom):
     screen.fill(WHITE)
-
-    for i in range(Height):
-        for j in range(Width):
+    if GameBoard is None:
+        return
+    for i in range(GameBoard.height):
+        for j in range(GameBoard.width):
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
-            if Field[i][j] > 0:
-                pygame.draw.rect(screen, Colors[Field[i][j]],
+            val = GameBoard.cell(i, j)
+            if val > 0:
+                pygame.draw.rect(screen, Colors[val],
                                  [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
 
 def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
@@ -163,12 +172,9 @@ def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
                                   zoom - 2, zoom - 2])
             
 def initialize(height, width):
-    global Height, Width, Field, State
-    Height = height
-    Width = width
-    Field = []
+    global GameBoard, State
+    GameBoard = Board(height, width)
     State = "start"
-    # code smell - why another initializion in the initalize() function?
     init_board()
 
 def main():

@@ -96,87 +96,62 @@ def make_figure(x, y):
 
 # Board implementation moved to `src/game/board.py`
 
+
 # ===========================
 # COLLISION DETECTION
 # ===========================
 def intersects(image):
     """Check if the current piece (image) collides with the board or walls."""
     intersection = False
-    for i in range(4):          # rows in 4x4 mini-grid
-        for j in range(4):      # columns in 4x4 mini-grid
-            if i * 4 + j in image:  # if this square is part of the shape
-                # Check boundaries and if cell is already filled
-                # If GameBoard not yet created, fall back to previous globals
-                if GameBoard is None:
-                    if i + ShiftY > Height - 1 or \
-                       j + ShiftX > Width - 1 or \
-                       j + ShiftX < 0 or \
-                       Field[i + ShiftY][j + ShiftX] > 0:
-                        intersection = True
-                else:
-                    if (i + ShiftY) >= GameBoard.height or \
-                       (j + ShiftX) >= GameBoard.width or \
-                       (j + ShiftX) < 0 or \
-                       GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
+    # code smell - what is 4? Magic number
+    for i in range(4):
+        for j in range(4):
+            if i * 4 + j in image:
+                # out of bounds
+                # code smell - confusing, why Y is related i and X is related j?
+                if GameBoard is None or \
+                   (i + ShiftY) >= GameBoard.height or \
+                   (j + ShiftX) >= GameBoard.width or \
+                   (j + ShiftX) < 0 or \
+                   GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
                         intersection = True
     return intersection
+
 
 # ===========================
 # LINE CLEARING
 # ===========================
 def break_lines():
-    """Remove full rows and shift everything down."""
-    global Field
-    # Prefer using GameBoard's method; fall back to old behavior if needed
+    # code smell - why is it hard to read code? why make two sub-functions
+    # for i in ...
+    #  is_filled = check_row_filled(...)
+    #  if is_filled:
+    #.   delete_row(...)
     if GameBoard is not None:
         GameBoard.clear_full_lines()
-        # keep Field in sync for backward compatibility
-        try:
-            Field = GameBoard._grid
-        except Exception:
-            pass
+    else:
+        # No board available; nothing to do
         return
 
-    # Fallback: operate on raw Field
-    for i in range(1, Height):
-        zeros = 0
-        for j in range(Width):
-            if Field[i][j] == 0:
-                zeros += 1
-        if zeros == 0: # row is full
-            # Shift all rows above down one
-            for k in range(i, 1, -1):
-                for j in range(Width):
-                    Field[k][j] = Field[k - 1][j]
 
 # ===========================
 # FREEZE (lock piece in place)
 # ===========================
 def freeze(image):
-    """Lock the piece into the field once it lands, then spawn a new one."""
-    global State, Field
-    # Place the blocks of the piece into the GameBoard if available
-    if GameBoard is not None:
-        for i in range(4):
-            for j in range(4):
-                if i * 4 + j in image:
-                    GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
-        # keep Field in sync
-        try:
-            Field = GameBoard._grid
-        except Exception:
-            pass
-    else:
-        for i in range(4):
-            for j in range(4):
-                if i * 4 + j in image:
-                    Field[i + ShiftY][j + ShiftX] = Color
-
-    break_lines()       # clear any completed lines
-    make_figure(3, 0)   # spawn a new piece at top
-    # If new piece immediately collides, game is over
+    # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
+    global State, GameBoard
+    if GameBoard is None:
+        # Nothing to write to
+        return
+    for i in range(4):
+        for j in range(4):
+            if i * 4 + j in image:
+                GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
+    break_lines()
+    make_figure(3, 0) 
     if intersects(Figures[Type][Rotation]):
         State = "gameover"
+
 
 # ===========================
 # MOVEMENT

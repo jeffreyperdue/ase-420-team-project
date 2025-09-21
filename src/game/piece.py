@@ -1,5 +1,6 @@
 import random
 import src.constants as constants
+import src.figures as figures
 
 class Piece:
     """
@@ -8,7 +9,7 @@ class Piece:
     Attributes:
         x (int): X-coordinate on the game grid.
         y (int): Y-coordinate on the game grid.
-        type (int): Index of the shape from constants.FIGURES.
+        type (int): Index of the shape from figures.SHAPES.
         color (int): Index of the color from constants.COLORS.
         rotation (int): Current rotation index for the shape.
     """
@@ -25,7 +26,7 @@ class Piece:
 
         self.x = x
         self.y = y
-        self.type = random.randint(0, len(constants.FIGURES) - 1) # pick random shape
+        self.type = random.randint(0, len(figures.SHAPES) - 1) # pick random shape
         self.color = random.randint(1, len(constants.COLORS) - 1) # pick random color
         self.rotation = 0 # start unrotated
 
@@ -76,7 +77,6 @@ class Piece:
                     field_row = row + self.y
                     field_col = col + self.x
                     field[field_row][field_col] = self.color
-        # TODO: Still need to implement this method in figures.py
         # Attempt to break completed lines
         field.break_lines()
 
@@ -136,6 +136,6 @@ class Piece:
         """
 
         oldRotation = self.rotation
-        self.rotation = (self.rotation + 1) % len(constants.FIGURES[self.type])
+        self.rotation = (self.rotation + 1) % len(figures.SHAPES[self.type])
         if self.intersects(field):
             self.rotation = oldRotation

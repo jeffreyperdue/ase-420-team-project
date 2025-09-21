@@ -47,4 +47,26 @@ class Piece:
         if newPiece.intersects(field):
             gameOver = True
 
+    def go_space(self, field):
+        while not self.intersects(field):
+            self.y += 1
+        self.y -= 1
+        self.freeze(field)
     
+    def go_down(self, field):
+        self.y += 1
+        if self.intersects():
+            self.y -= 1
+            self.freeze(field)
+    
+    def go_side(self, x_movement, field):
+        oldX = self.x
+        self.x += x_movement
+        if self.intersects(field):
+            self.x = oldX
+    
+    def rotate(self, field):
+        oldRotation = self.rotation
+        self.rotation = (self.rotation + 1) % len(constants.FIGURES[self.type])
+        if self.intersects(field):
+            self.rotation = oldRotation

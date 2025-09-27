@@ -2,12 +2,17 @@ import pygame
 import random
 import os
 import sys
-# Import Board class from src/game/board.py
+
 # Ensure repository root is on sys.path so imports work when running from starter_code
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
+
+# Import Board class from src/game/board.py
 from src.game.board import Board
+
+# Import playing board/grid dimensions from src/constants.py
+from src.constants import HEIGHT, WIDTH
 
 # Global constants - it's OK as it's read only
 # code smell - why list when tuple (immutable) is OK? Use immutable objects as much as possible
@@ -46,10 +51,6 @@ Rotation = 0
 # Game state
 State = "start" # or "gameover"
 
-# Dimensions of the playing grid
-Height = 20
-Width = 10
-
 # Encapsulated board instance (created in initialize)
 GameBoard = None
 
@@ -83,10 +84,10 @@ def intersects(image):
                 # out of bounds
                 # code smell - confusing, why Y is related i and X is related j?
                 if GameBoard is None or \
-                   (i + ShiftY) >= GameBoard.height or \
-                   (j + ShiftX) >= GameBoard.width or \
+                   (i + ShiftY) >= GameBoard.get_height() or \
+                   (j + ShiftX) >= GameBoard.get_width() or \
                    (j + ShiftX) < 0 or \
-                   GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
+                   GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
                         intersection = True
     return intersection
 
@@ -154,13 +155,13 @@ def draw_board(screen, x, y, zoom):
     # Draw using GameBoard
     if GameBoard is None:
         return
-    for i in range(GameBoard.height):
-        for j in range(GameBoard.width):
+    for i in range(GameBoard.get_height()):
+        for j in range(GameBoard.get_width()):
             # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
             
             # draw filled block if > 0
-            val = GameBoard.cell(i, j)
+            val = GameBoard.get_cell(i, j)
             if val > 0:
                 pygame.draw.rect(screen, Colors[val],
                                  [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
@@ -198,7 +199,7 @@ def main():
     counter = 0
     pressing_down = False
 
-    initialize(Height, Width)  # Height: # of rows, Width: # of columns
+    initialize(HEIGHT, WIDTH)  # HEIGHT: # of rows, WIDTH: # of columns
     make_figure(3,0)
     done = False
     level = 1

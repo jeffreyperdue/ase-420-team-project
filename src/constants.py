@@ -2,6 +2,10 @@
 SCREEN_SIZE = (400, 500)
 FPS = 60
 
+# Playing grid/board dimensions
+HEIGHT = 20 # number of rows
+WIDTH = 10 # number of columns
+
 # Grid size for field
 GRID_SIZE = 4
 

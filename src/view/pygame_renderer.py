@@ -1,5 +1,5 @@
 import pygame
-from src.constants import WHITE, GRAY, Colors, CELL_SIZE
+from src.constants import WHITE, GRAY, COLORS, CELL_SIZE
 
 class PygameRenderer:
     def __init__(self, screen, board_origin=(100, 60)):
@@ -25,12 +25,12 @@ class PygameRenderer:
                 if cell_value > 0:
                     pygame.draw.rect(
                         self.screen,
-                        Colors[cell_value],
+                        COLORS[cell_value],
                         [rect[0] + 1, rect[1] + 1, CELL_SIZE - 2, CELL_SIZE - 2]
                     )
 
     def draw_piece(self, piece):
-        color = Colors[piece.color]
+        color = COLORS[piece.color]
         for (dx, dy) in piece.cells:
             rect = [
                 self.board_x + CELL_SIZE * (piece.x + dx),

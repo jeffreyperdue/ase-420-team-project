@@ -25,20 +25,6 @@ paginate: true
 
 ---
 
-## Week 3 Goals Summary
-
-### Anna's Goals ✅
-- ✅ Refactored and optimized the line detection and clearing logic  
-- ✅ Wrote unit tests for line detection and clearing
-- ✅ **BONUS**: Further optimized playing field grid using `Row` bitboards and `LinkedList`
-
-### Owen's Goals ✅
-- ✅ Implemented keyboard mapping and input handling system
-- ✅ Created `InputHandler` class for event processing
-- ✅ Integrated input system into main game loop
-
----
-
 ## Statistics Overview
 
 ### Lines of Code Added

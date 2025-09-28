@@ -77,6 +77,8 @@ Tzoom = 20
 # Current piece’s position on the grid
 ShiftX = 0  # left/right
 ShiftY = 0  # up/down
+# Encapsulated Board (created in initialize)
+GameBoard = None
 
 # Encapsulated Board (created in initialize)
 GameBoard = None
@@ -93,6 +95,7 @@ def make_figure(x, y):
     Color  = random.randint(1, len(Colors) - 1)  # pick random color
     Rotation = 0                                 # start unrotated
 
+
 # Board implementation moved to `src/game/board.py`
 
 # ===========================
@@ -106,32 +109,75 @@ def intersects(image):
         for j in range(4):          # columns in 4x4 mini-grid
             if i * 4 + j in image: # if this square is part of the shape
                 # Check boundaries and if cell is already filled
-                if GameBoard is None or \
-                   (i + ShiftY) >= GameBoard.height or \
-                   (j + ShiftX) >= GameBoard.width or \
-                   (j + ShiftX) < 0 or \
-                   GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
+                # If GameBoard not yet created, fall back to previous globals
+                if GameBoard is None:
+                    if i + ShiftY > Height - 1 or \
+                       j + ShiftX > Width - 1 or \
+                       j + ShiftX < 0 or \
+                       Field[i + ShiftY][j + ShiftX] > 0:
+                        intersection = True
+                else:
+                    if (i + ShiftY) >= GameBoard.height or \
+                       (j + ShiftX) >= GameBoard.width or \
+                       (j + ShiftX) < 0 or \
+                       GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
+
                         intersection = True
     return intersection
+
+# ===========================
+# LINE CLEARING
+# ===========================
+def break_lines():
+    """Remove full rows and shift everything down."""
+    global Field
+    # Prefer using GameBoard's method; fall back to old behavior if needed
+    if GameBoard is not None:
+        GameBoard.clear_full_lines()
+        # keep Field in sync for backward compatibility
+        try:
+            Field = GameBoard._grid
+        except Exception:
+            pass
+        return
+
+    # Fallback: operate on raw Field
+    for i in range(1, Height):
+        zeros = 0
+        for j in range(Width):
+            if Field[i][j] == 0:
+                zeros += 1
+        if zeros == 0: # row is full
+            # Shift all rows above down one
+            for k in range(i, 1, -1):
+                for j in range(Width):
+                    Field[k][j] = Field[k - 1][j]
 
 # ===========================
 # FREEZE (lock piece in place)
 # ===========================
 def freeze(image):
-    # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
-    global State, GameBoard
-    if GameBoard is None:
-        # Nothing to write to
-        return
-    
-    for i in range(4):
-        for j in range(4):
-            if i * 4 + j in image:
-                GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
-    
-    GameBoard.clear_full_lines() # clear any filled lines
-    make_figure(3, 0) # spawn a new piece at top
+    """Lock the piece into the field once it lands, then spawn a new one."""
+    global State, Field
+    # Place the blocks of the piece into the GameBoard if available
+    if GameBoard is not None:
+        for i in range(4):
+            for j in range(4):
+                if i * 4 + j in image:
+                    GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
+        # keep Field in sync
+        try:
+            Field = GameBoard._grid
+        except Exception:
+            pass
+    else:
+        for i in range(4):
+            for j in range(4):
+                if i * 4 + j in image:
+                    Field[i + ShiftY][j + ShiftX] = Color
 
+    break_lines()       # clear any completed lines
+    make_figure(3, 0)   # spawn a new piece at top
     # If new piece immediately collides, game is over
     if intersects(Figures[Type][Rotation]):
         State = "gameover"
@@ -172,11 +218,44 @@ def rotate():
         Rotation = old_rotation  # undo if collides
 
 # ===========================
+# BOARD SETUP
+# ===========================
+def init_board():
+    """Create an empty playing field."""
+    # If using GameBoard, clear it. Otherwise build raw Field list.
+    if GameBoard is not None:
+        GameBoard.clear()
+        try:
+            global Field
+            Field = GameBoard._grid
+        except Exception:
+            pass
+        return
+
+    for i in range(Height):
+        new_line = [0] * Width  # a row of empty cells
+        Field.append(new_line)
+
+# ===========================
 # DRAWING FUNCTIONS
 # ===========================
 def draw_board(screen, x, y, zoom):
     """Draw the playing field and placed blocks."""
     screen.fill(WHITE) # clear background
+    # Draw using GameBoard if available, otherwise use legacy globals
+    if GameBoard is not None:
+        for i in range(GameBoard.height):
+            for j in range(GameBoard.width):
+                # draw grid outline
+                pygame.draw.rect(screen, GRAY,
+                                 [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+                # draw filled block if > 0
+                val = GameBoard.cell(i, j)
+                if val > 0:
+                    pygame.draw.rect(screen, Colors[val],
+                                     [x + zoom * j + 1, y + zoom * i + 1,
+                                      zoom - 2, zoom - 1])
+        return
 
     # Draw using GameBoard
     if GameBoard is None:
@@ -209,15 +288,14 @@ def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
 # ===========================
 def initialize(height, width):
     """Initialize game state and create empty board."""
-    global State, GameBoard
-
-    # Create an encapsulated GameBoard and initialize it
-    GameBoard = Board(height, width)
-    
-    # Clear the board to ensure it's empty
-    GameBoard.clear()
-
+    global Height, Width, Field, State, GameBoard
+    Height = height
+    Width  = width
+    Field  = []
     State  = "start"
+    # Create an encapsulated GameBoard and initialize it
+    GameBoard = Board(Height, Width)
+    init_board()
 
 # ===========================
 # MAIN GAME LOOP

@@ -11,9 +11,6 @@ if repo_root not in sys.path:
 # Import Board class from src/game/board.py
 from src.game.board import Board
 
-# Import playing board/grid dimensions from src/constants.py
-from src.constants import HEIGHT, WIDTH
-
 # Global constants - it's OK as it's read only
 # code smell - why list when tuple (immutable) is OK? Use immutable objects as much as possible
 Colors = [
@@ -91,18 +88,30 @@ def intersects(image):
                         intersection = True
     return intersection
 
+def figure_to_bitboard(image):
+    """
+    Convert a flat 4x4 shape representation into bitboard rows.
+
+    Args:
+        image (list[int]): A list of indices (0–15) representing filled cells in a 4x4 grid.
+
+    Returns:
+        list[int]: A list of 4 integers, each representing a row in bitboard format.
+        Example: [0b0000, 0b1110, 0b0100, 0b0000] for a T shape
+    """
+
+    rows = [0] * 4 # Initialize 4 empty rows (bitboards)
+    for index in image:
+        row, col = divmod(index, 4) # Convert flat index to its corresponding (row, column) coordinates
+        rows[row] |= (1 << col) # Set the bit at col in row
+    return rows # Return the 4-row bitboard representation
+
 def freeze(image):
     # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
-    global State, GameBoard
-    if GameBoard is None:
-        # Nothing to write to
-        return
-    
-    for i in range(4):
-        for j in range(4):
-            if i * 4 + j in image:
-                GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
-    
+    global State
+
+    piece_rows = figure_to_bitboard(image) # Convert figure to bitboard rows
+    GameBoard.place_piece_rows(piece_rows, ShiftX, ShiftY, Color) # Place piece on the board
     GameBoard.clear_full_lines() # clear any filled lines
     make_figure(3, 0) # spawn a new piece at top
     
@@ -141,14 +150,6 @@ def rotate():
     if intersects(Figures[Type][Rotation]):
         Rotation = old_rotation
         
-def init_board():
-    # Initialize/clear the encapsulated GameBoard
-    if GameBoard is not None:
-        GameBoard.clear()
-    else:
-        # No board to initialize
-        return
-
 def draw_board(screen, x, y, zoom):
     screen.fill(WHITE)
 
@@ -176,14 +177,12 @@ def draw_figure(screen, image, startX, startY, shiftX, shiftY, zoom):
                                   startY + zoom * (i + shiftY) + 1,
                                   zoom - 2, zoom - 2])
             
-def initialize(height, width):
+def initialize():
+    """Initialize game state and create empty board."""
     global GameBoard, State
 
     # Create an encapsulated GameBoard and initialize it
-    GameBoard = Board(height, width)
-
-    # Clear the board to ensure it's empty
-    GameBoard.clear()
+    GameBoard = Board()
 
     State = "start"
     
@@ -199,7 +198,7 @@ def main():
     counter = 0
     pressing_down = False
 
-    initialize(HEIGHT, WIDTH)  # HEIGHT: # of rows, WIDTH: # of columns
+    initialize()
     make_figure(3,0)
     done = False
     level = 1

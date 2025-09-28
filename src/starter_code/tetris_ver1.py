@@ -52,6 +52,7 @@ Width = 10
 
 # Encapsulated board instance (created in initialize)
 GameBoard = None
+
 # StartX/Y position in the screen
 StartX = 100
 StartY= 60
@@ -89,31 +90,20 @@ def intersects(image):
                         intersection = True
     return intersection
 
-def break_lines():
-    # code smell - why is it hard to read code? why make two sub-functions
-    # for i in ...
-    #  is_filled = check_row_filled(...)
-    #  if is_filled:
-    #.   delete_row(...)
-    if GameBoard is not None:
-        GameBoard.clear_full_lines()
-    else:
-        # No board available; nothing to do
-        return
-
 def freeze(image):
     # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
     global State, GameBoard
     if GameBoard is None:
         # Nothing to write to
         return
-
     for i in range(4):
         for j in range(4):
             if i * 4 + j in image:
                 GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
-    break_lines()
-    make_figure(3, 0) 
+    
+    GameBoard.clear_full_lines() # clear any filled lines
+    make_figure(3, 0) # spawn a new piece at top
+    
     if intersects(Figures[Type][Rotation]):
         State = "gameover"
 
@@ -160,11 +150,15 @@ def init_board():
 def draw_board(screen, x, y, zoom):
     screen.fill(WHITE)
 
+    # Draw using GameBoard
     if GameBoard is None:
         return
     for i in range(GameBoard.height):
         for j in range(GameBoard.width):
+            # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+            
+            # draw filled block if > 0
             val = GameBoard.cell(i, j)
             if val > 0:
                 pygame.draw.rect(screen, Colors[val],
@@ -182,9 +176,14 @@ def draw_figure(screen, image, startX, startY, shiftX, shiftY, zoom):
             
 def initialize(height, width):
     global GameBoard, State
+
+    # Create an encapsulated GameBoard and initialize it
     GameBoard = Board(height, width)
+
+    # Clear the board to ensure it's empty
+    GameBoard.clear()
+
     State = "start"
-    init_board()
     
 def main():
     # Pygame related init

@@ -1,7 +1,7 @@
 import pygame
 from src.constants import SCREEN_SIZE, FPS
 from src.view.pygame_renderer import PygameRenderer
-
+from src.view.input import InputHandler
 class Game:
     def __init__(self, board, piece_generator):
         pygame.init()
@@ -13,15 +13,25 @@ class Game:
         self.piece_generator = piece_generator
         self.active_piece = piece_generator.spawn()
         self.renderer = PygameRenderer(self.screen)
+        self.input_handler = InputHandler()
 
         self.done = False
 
     def run(self):
         while not self.done:
-            for event in pygame.event.get():
+            events = pygame.event.get()
+
+            # Quit check
+            for event in events:
                 if event.type == pygame.QUIT:
                     self.done = True
-                # input handling will live in input.py later
+
+            # turn raw pygame events → intents
+            intents = self.input_handler.get_intents(events)
+
+            # Debug: log intents to console
+            if intents:
+                print("Intents:", intents)
 
             # TODO: gravity / movement updates
 

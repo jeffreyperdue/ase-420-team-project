@@ -2,11 +2,13 @@ import pygame
 import random
 import os
 import sys
-# Import Board class from src/game/board.py
+
 # Ensure repository root is on sys.path so imports work when running from starter_code
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
+
+# Import Board class from src/game/board.py
 from src.game.board import Board
 
 # Global constants - it's OK as it's read only
@@ -46,10 +48,6 @@ Rotation = 0
 # Game state
 State = "start" # or "gameover"
 
-# Dimensions of the playing grid
-Height = 20
-Width = 10
-
 # Encapsulated board instance (created in initialize)
 GameBoard = None
 
@@ -83,24 +81,37 @@ def intersects(image):
                 # out of bounds
                 # code smell - confusing, why Y is related i and X is related j?
                 if GameBoard is None or \
-                   (i + ShiftY) >= GameBoard.height or \
-                   (j + ShiftX) >= GameBoard.width or \
+                   (i + ShiftY) >= GameBoard.get_height() or \
+                   (j + ShiftX) >= GameBoard.get_width() or \
                    (j + ShiftX) < 0 or \
-                   GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
+                   GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
                         intersection = True
     return intersection
 
+def figure_to_bitboard(image):
+    """
+    Convert a flat 4x4 shape representation into bitboard rows.
+
+    Args:
+        image (list[int]): A list of indices (0–15) representing filled cells in a 4x4 grid.
+
+    Returns:
+        list[int]: A list of 4 integers, each representing a row in bitboard format.
+        Example: [0b0000, 0b1110, 0b0100, 0b0000] for a T shape
+    """
+
+    rows = [0] * 4 # Initialize 4 empty rows (bitboards)
+    for index in image:
+        row, col = divmod(index, 4) # Convert flat index to its corresponding (row, column) coordinates
+        rows[row] |= (1 << col) # Set the bit at col in row
+    return rows # Return the 4-row bitboard representation
+
 def freeze(image):
     # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
-    global State, GameBoard
-    if GameBoard is None:
-        # Nothing to write to
-        return
-    for i in range(4):
-        for j in range(4):
-            if i * 4 + j in image:
-                GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
-    
+    global State
+
+    piece_rows = figure_to_bitboard(image) # Convert figure to bitboard rows
+    GameBoard.place_piece_rows(piece_rows, ShiftX, ShiftY, Color) # Place piece on the board
     GameBoard.clear_full_lines() # clear any filled lines
     make_figure(3, 0) # spawn a new piece at top
     
@@ -139,27 +150,19 @@ def rotate():
     if intersects(Figures[Type][Rotation]):
         Rotation = old_rotation
         
-def init_board():
-    # Initialize/clear the encapsulated GameBoard
-    if GameBoard is not None:
-        GameBoard.clear()
-    else:
-        # No board to initialize
-        return
-
 def draw_board(screen, x, y, zoom):
     screen.fill(WHITE)
 
     # Draw using GameBoard
     if GameBoard is None:
         return
-    for i in range(GameBoard.height):
-        for j in range(GameBoard.width):
+    for i in range(GameBoard.get_height()):
+        for j in range(GameBoard.get_width()):
             # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
             
             # draw filled block if > 0
-            val = GameBoard.cell(i, j)
+            val = GameBoard.get_cell(i, j)
             if val > 0:
                 pygame.draw.rect(screen, Colors[val],
                                  [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
@@ -174,14 +177,12 @@ def draw_figure(screen, image, startX, startY, shiftX, shiftY, zoom):
                                   startY + zoom * (i + shiftY) + 1,
                                   zoom - 2, zoom - 2])
             
-def initialize(height, width):
+def initialize():
+    """Initialize game state and create empty board."""
     global GameBoard, State
 
     # Create an encapsulated GameBoard and initialize it
-    GameBoard = Board(height, width)
-
-    # Clear the board to ensure it's empty
-    GameBoard.clear()
+    GameBoard = Board()
 
     State = "start"
     
@@ -197,7 +198,7 @@ def main():
     counter = 0
     pressing_down = False
 
-    initialize(Height, Width)  # Height: # of rows, Width: # of columns
+    initialize()
     make_figure(3,0)
     done = False
     level = 1

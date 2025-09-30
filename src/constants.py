@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 # Screen size
 SCREEN_SIZE = (400, 500)
 FPS = 60
@@ -8,7 +6,6 @@ FPS = 60
 HEIGHT = 20 # number of rows
 WIDTH = 10 # number of columns
 
->>>>>>> origin/main
 # Grid size for field
 GRID_SIZE = 4
 
@@ -24,11 +21,8 @@ BROWN = (80, 34, 22)
 GREEN = (80, 134, 22)
 RED = (180, 34, 22)
 PINK = (180, 34, 122)
-<<<<<<< HEAD
-=======
 WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
->>>>>>> origin/main
 
 COLORS = (
     BLACK,
@@ -38,13 +32,9 @@ COLORS = (
     GREEN,
     RED,
     PINK,
-<<<<<<< HEAD
-)
-=======
     WHITE,
     GRAY,
 )
 
 # Cell (block) size in pixels
 CELL_SIZE = 20
->>>>>>> origin/main

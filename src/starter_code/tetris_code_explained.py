@@ -1,5 +1,15 @@
 import pygame
 import random
+import os
+import sys
+
+# Ensure repository root is on sys.path so imports work when running from starter_code
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
+
+# Import Board class from src/game/board.py
+from src.game.board import Board
 
 # ===========================
 # COLORS
@@ -55,11 +65,6 @@ Color    = 0  # Which color is used
 Rotation = 0  # Which rotation is used
 
 State = "start" # Game state: "start" (playing) or "gameover"
-Field = []      # The grid of placed blocks (filled with numbers for colors)
-
-# Dimensions of the playing grid (set later in initialize())
-Height = 0
-Width  = 0
 
 # Where on the screen to start drawing the board
 StartX = 100
@@ -71,6 +76,9 @@ Tzoom = 20
 # Current piece’s position on the grid
 ShiftX = 0  # left/right
 ShiftY = 0  # up/down
+
+# Encapsulated Board (created in initialize)
+GameBoard = None
 
 # ===========================
 # PIECE CREATION
@@ -84,53 +92,60 @@ def make_figure(x, y):
     Color  = random.randint(1, len(Colors) - 1)  # pick random color
     Rotation = 0                                 # start unrotated
 
+# Board implementation moved to `src/game/board.py`
+
 # ===========================
 # COLLISION DETECTION
 # ===========================
 def intersects(image):
     """Check if the current piece (image) collides with the board or walls."""
     intersection = False
-    for i in range(4):          # rows in 4x4 mini-grid
-        for j in range(4):      # columns in 4x4 mini-grid
-            if i * 4 + j in image:  # if this square is part of the shape
+    # code smell - what is 4? Magic number
+    for i in range(4):              # rows in 4x4 mini-grid
+        for j in range(4):          # columns in 4x4 mini-grid
+            if i * 4 + j in image: # if this square is part of the shape
                 # Check boundaries and if cell is already filled
-                if i + ShiftY > Height - 1 or \
-                   j + ShiftX > Width - 1 or \
-                   j + ShiftX < 0 or \
-                   Field[i + ShiftY][j + ShiftX] > 0:
-                       intersection = True
+                if GameBoard is None or \
+                   (i + ShiftY) >= GameBoard.get_height() or \
+                   (j + ShiftX) >= GameBoard.get_width() or \
+                   (j + ShiftX) < 0 or \
+                   GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
+                        intersection = True
     return intersection
 
-# ===========================
-# LINE CLEARING
-# ===========================
-def break_lines():
-    """Remove full rows and shift everything down."""
-    global Field
-    for i in range(1, Height):
-        zeros = 0
-        for j in range(Width):
-            if Field[i][j] == 0:
-                zeros += 1
-        if zeros == 0: # row is full
-            # Shift all rows above down one
-            for k in range(i, 1, -1):
-                for j in range(Width):
-                    Field[k][j] = Field[k - 1][j]
+# =============================
+# FIGURE TO BITBOARD CONVERSION
+# =============================
+def figure_to_bitboard(image):
+    """
+    Convert a flat 4x4 shape representation into bitboard rows.
+
+    Args:
+        image (list[int]): A list of indices (0–15) representing filled cells in a 4x4 grid.
+
+    Returns:
+        list[int]: A list of 4 integers, each representing a row in bitboard format.
+        Example: [0b0000, 0b1110, 0b0100, 0b0000] for a T shape
+    """
+
+    rows = [0] * 4 # Initialize 4 empty rows (bitboards)
+    for index in image:
+        row, col = divmod(index, 4) # Convert flat index to its corresponding (row, column) coordinates
+        rows[row] |= (1 << col) # Set the bit at col in row
+    return rows # Return the 4-row bitboard representation
 
 # ===========================
 # FREEZE (lock piece in place)
 # ===========================
 def freeze(image):
-    """Lock the piece into the field once it lands, then spawn a new one."""
-    global Field, State
-    # Place the blocks of the piece into the Field
-    for i in range(4):
-        for j in range(4):
-            if i * 4 + j in image:
-                Field[i + ShiftY][j + ShiftX] = Color
-    break_lines()       # clear any completed lines
-    make_figure(3, 0)   # spawn a new piece at top
+    # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
+    global State
+    
+    piece_rows = figure_to_bitboard(image) # Convert figure to bitboard rows
+    GameBoard.place_piece_rows(piece_rows, ShiftX, ShiftY, Color) # Place piece on the board
+    GameBoard.clear_full_lines() # clear any filled lines
+    make_figure(3, 0) # spawn a new piece at top
+
     # If new piece immediately collides, game is over
     if intersects(Figures[Type][Rotation]):
         State = "gameover"
@@ -171,31 +186,26 @@ def rotate():
         Rotation = old_rotation  # undo if collides
 
 # ===========================
-# BOARD SETUP
-# ===========================
-def init_board():
-    """Create an empty playing field."""
-    for i in range(Height):
-        new_line = [0] * Width  # a row of empty cells
-        Field.append(new_line)
-
-# ===========================
 # DRAWING FUNCTIONS
 # ===========================
 def draw_board(screen, x, y, zoom):
     """Draw the playing field and placed blocks."""
     screen.fill(WHITE) # clear background
 
-    for i in range(Height):
-        for j in range(Width):
+    # Draw using GameBoard
+    if GameBoard is None:
+        return
+    for i in range(GameBoard.get_height()):
+        for j in range(GameBoard.get_width()):
             # draw grid outline
-            pygame.draw.rect(screen, GRAY,
-                             [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+            pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
+            
             # draw filled block if > 0
-            if Field[i][j] > 0:
-                pygame.draw.rect(screen, Colors[Field[i][j]],
-                                 [x + zoom * j + 1, y + zoom * i + 1,
-                                  zoom - 2, zoom - 1])
+            val = GameBoard.get_cell(i, j)
+            if val > 0:
+                pygame.draw.rect(screen, Colors[val],
+                                    [x + zoom * j + 1, y + zoom * i + 1,
+                                    zoom - 2, zoom - 1])
 
 def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
     """Draw the current falling piece."""
@@ -211,14 +221,14 @@ def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
 # ===========================
 # INITIALIZATION
 # ===========================
-def initialize(height, width):
+def initialize():
     """Initialize game state and create empty board."""
-    global Height, Width, Field, State
-    Height = height
-    Width  = width
-    Field  = []
+    global State, GameBoard
+
+    # Create an encapsulated GameBoard and initialize it
+    GameBoard = Board()
+    
     State  = "start"
-    init_board()
 
 # ===========================
 # MAIN GAME LOOP
@@ -236,7 +246,7 @@ def main():
     pressing_down = False
 
     # Start game
-    initialize(20, 10)  # 20 rows, 10 columns
+    initialize()
     make_figure(3, 0)   # spawn first piece
     done = False
     level = 1

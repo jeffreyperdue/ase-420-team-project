@@ -17,7 +17,7 @@
   - **Total**: 605
 - **Burn down rate**
   - 20% per week
-  - 6.7% per day
+  - ~3% per day
   - Based on number of goals/milestones completed (2/10)
 
 ## Major Changes Completed

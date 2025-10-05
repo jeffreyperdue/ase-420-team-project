@@ -25,20 +25,6 @@ paginate: true
 
 ---
 
-## Week 3 Goals Summary
-
-### Anna's Goals ✅
-- ✅ Refactored and optimized the line detection and clearing logic  
-- ✅ Wrote unit tests for line detection and clearing
-- ✅ **BONUS**: Further optimized playing field grid using `Row` bitboards and `LinkedList`
-
-### Owen's Goals ✅
-- ✅ Implemented keyboard mapping and input handling system
-- ✅ Created `InputHandler` class for event processing
-- ✅ Integrated input system into main game loop
-
----
-
 ## Statistics Overview
 
 ### Lines of Code Added
@@ -303,7 +289,7 @@ GameBoard.clear_full_lines()
 - **Cody**: Already ahead with Piece class implementation, ready for collision detection
 - **Anna**: Advanced board system with bitmask optimization ready for integration
 - **Owen**: Input system complete, ready for main loop integration
-- **Overall**: Strong foundation for Week 4 integration phase
+- **Overall**: Strong foundation for Week 4 
 
 ---
 

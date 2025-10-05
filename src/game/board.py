@@ -82,7 +82,7 @@ class Board:
         for _ in range(self.get_height() - self._rows.length()):
             self._rows.insert_top(Row())
 
-    def grid_position_to_coords(position) -> tuple:
+    def grid_position_to_coords(self, position) -> tuple:
         """
         Convert the given grid position for the piece cell position into coordinates to be placed on board
         Example: 1 -> (4, 0)
@@ -94,13 +94,13 @@ class Board:
 
         return (position % 4, position // 4)
 
-    def will_piece_collide(self, piece, col, row) -> bool:
+    def will_piece_collide(self, piece) -> bool:
         """
         Check if placing the given piece at (col, row) would collide
         with existing occupied cells on the board.
 
         Returns:
-            bool: True if piece will collide with board or other piece, False if not
+            bool: True if piece will collide with other piece, False if not
         """
 
         # Getting tuple that represents shape of piece to be placed
@@ -117,7 +117,7 @@ class Board:
             
         return False
 
-    def place_piece(self, piece, col, row) -> bool:
+    def place_piece(self, piece) -> bool:
         """
         Placing piece cells on the rows needed based on piece passed into method, also setting color of each cell in rows.
 
@@ -126,7 +126,7 @@ class Board:
         """
         
         # Checking if new piece will collide with other pieces or end of board
-        if (self.will_piece_collide(piece, col, row)):
+        if (self.will_piece_collide(piece)):
             return False
         
         # Getting tuple that represents shape of piece to be placed

@@ -1,4 +1,5 @@
-# Define the shapes of the Tetris pieces and their rotations
+# Define the shapes of the Tetris pieces in each rotation
+# Represented as tuples of grid positions in a 4x4 matrix
 I_SHAPE = ((1, 5, 9, 13), (4, 5, 6, 7))
 Z_SHAPE = ((4, 5, 9, 10), (2, 6, 5, 9))
 S_SHAPE = ((6, 7, 9, 10), (1, 5, 6, 10))

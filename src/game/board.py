@@ -4,6 +4,7 @@ from src.utils.linked_list import LinkedList    # Import the LinkedList class to
 # Import playing board/grid dimensions from src/constants.py
 from src.constants import HEIGHT, WIDTH     # Import board dimensions from a shared constants file
 
+from src.figures import SHAPES
 class Board:
     """
         Encapsulates the playing field grid and related operations
@@ -81,10 +82,50 @@ class Board:
         for _ in range(self.get_height() - self._rows.length()):
             self._rows.insert_top(Row())
 
-    def check_collision(self, piece_rows, col, row):
-        """Stub for collision detection — to be implemented by teammates."""
+    def grid_position_to_coords(position) -> tuple:
+        """
+        Convert the given grid position for the piece cell position into coordinates to be placed on board
+        Example: 1 -> (4, 0)
+        
+        Returns:
+            tuple: Tuple that represents coordinates of cell converted from the grid index
+
+        """
+
+        return (position % 4, position // 4)
+
+    def will_piece_collide(self, piece, col, row) -> bool:
+        """
+        Check if placing the given piece rows at (col, row) would collide
+        with existing occupied cells on the board.
+
+        Returns:
+            bool: True if piece will collide with board or other piece, False if not
+        """
+
+        
+
         raise NotImplementedError("check_collision() is not implemented yet")
 
-    def place_piece_rows(self, piece_rows, col, row, color):
-        """Stub for piece placement — to be implemented by teammates."""
-        raise NotImplementedError("place_piece_rows() is not implemented yet")
+    def place_piece(self, piece, col, row) -> bool:
+        """
+        Placing piece cells on the rows needed based on piece passed into method, also setting color of each cell in rows.
+
+        Returns:
+            bool: True if placement was successful, False if collision was detected
+        """
+        
+        # Checking if new piece will collide with other pieces or end of board
+        if (self.will_piece_collide(piece, col, row)):
+            return False
+        
+        # Getting tuple that represents shape of piece to be placed
+        shape = SHAPES[piece.type][piece.rotation]
+
+        # Filling in cells for the shape
+        for grid_position in shape:
+            coords = self.grid_position_to_coords(grid_position)
+
+            self.set_cell(coords[1], coords[0], piece.color)
+            
+        return True

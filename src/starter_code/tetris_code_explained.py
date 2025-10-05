@@ -11,6 +11,12 @@ if repo_root not in sys.path:
 # Import Board class from src/game/board.py
 from src.game.board import Board
 
+# Import the Row class, which represents a single bitboard row
+from src.game.row import Row
+
+# Import global constants
+import src.constants as constants
+
 # ===========================
 # COLORS
 # ===========================
@@ -106,8 +112,8 @@ def intersects(image):
             if i * 4 + j in image: # if this square is part of the shape
                 # Check boundaries and if cell is already filled
                 if GameBoard is None or \
-                   (i + ShiftY) >= GameBoard.get_height() or \
-                   (j + ShiftX) >= GameBoard.get_width() or \
+                   (i + ShiftY) >= GameBoard.height or \
+                   (j + ShiftX) >= GameBoard.width or \
                    (j + ShiftX) < 0 or \
                    GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
                         intersection = True
@@ -195,8 +201,8 @@ def draw_board(screen, x, y, zoom):
     # Draw using GameBoard
     if GameBoard is None:
         return
-    for i in range(GameBoard.get_height()):
-        for j in range(GameBoard.get_width()):
+    for i in range(GameBoard.height):
+        for j in range(GameBoard.width):
             # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
             
@@ -226,7 +232,7 @@ def initialize():
     global State, GameBoard
 
     # Create an encapsulated GameBoard and initialize it
-    GameBoard = Board()
+    GameBoard = Board(row_factory=lambda: Row(constants.WIDTH))
     
     State  = "start"
 

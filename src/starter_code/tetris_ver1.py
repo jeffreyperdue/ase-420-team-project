@@ -11,6 +11,9 @@ if repo_root not in sys.path:
 # Import Board class from src/game/board.py
 from src.game.board import Board
 
+# Import global constants
+import src.constants as constants
+
 # Global constants - it's OK as it's read only
 # code smell - why list when tuple (immutable) is OK? Use immutable objects as much as possible
 Colors = [
@@ -81,11 +84,11 @@ def intersects(image):
                 # out of bounds
                 # code smell - confusing, why Y is related i and X is related j?
                 if GameBoard is None or \
-                   (i + ShiftY) >= GameBoard.get_height() or \
-                   (j + ShiftX) >= GameBoard.get_width() or \
-                   (j + ShiftX) < 0 or \
-                   GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
-                        intersection = True
+                    (i + ShiftY) >= GameBoard.height or \
+                    (j + ShiftX) >= GameBoard.width or \
+                    (j + ShiftX) < 0 or \
+                    GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
+                    intersection = True
     return intersection
 
 def figure_to_bitboard(image):
@@ -156,8 +159,8 @@ def draw_board(screen, x, y, zoom):
     # Draw using GameBoard
     if GameBoard is None:
         return
-    for i in range(GameBoard.get_height()):
-        for j in range(GameBoard.get_width()):
+    for i in range(GameBoard.height):
+        for j in range(GameBoard.width):
             # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
             
@@ -165,7 +168,7 @@ def draw_board(screen, x, y, zoom):
             val = GameBoard.get_cell(i, j)
             if val > 0:
                 pygame.draw.rect(screen, Colors[val],
-                                 [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
+                                [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
 
 def draw_figure(screen, image, startX, startY, shiftX, shiftY, zoom):
     for i in range(4):
@@ -182,7 +185,8 @@ def initialize():
     global GameBoard, State
 
     # Create an encapsulated GameBoard and initialize it
-    GameBoard = Board()
+    from src.game.row import Row
+    GameBoard = Board(lambda: Row(constants.WIDTH))
 
     State = "start"
     

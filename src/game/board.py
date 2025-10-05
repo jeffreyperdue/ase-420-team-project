@@ -96,16 +96,26 @@ class Board:
 
     def will_piece_collide(self, piece, col, row) -> bool:
         """
-        Check if placing the given piece rows at (col, row) would collide
+        Check if placing the given piece at (col, row) would collide
         with existing occupied cells on the board.
 
         Returns:
             bool: True if piece will collide with board or other piece, False if not
         """
 
-        
+        # Getting tuple that represents shape of piece to be placed
+        shape = SHAPES[piece.type][piece.rotation]
 
-        raise NotImplementedError("check_collision() is not implemented yet")
+        # Going through each cell in the piece to be placed and ensuring that will not collide with other piece or end of board
+        for grid_position in shape:
+            coords = self.grid_position_to_coords(grid_position)
+            col = coords[0]
+            row = coords[1]
+
+            if self.get_cell(row, col):
+                return True
+            
+        return False
 
     def place_piece(self, piece, col, row) -> bool:
         """

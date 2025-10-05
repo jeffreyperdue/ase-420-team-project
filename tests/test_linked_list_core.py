@@ -1,3 +1,14 @@
+"""
+Unit tests for the core Linked List class functionality.
+
+To run these tests from the repository root:
+    python -m unittest tests/test_linked_list_core.py         # Simple run
+    python -m unittest -v tests/test_linked_list_core.py      # Verbose output
+    
+To run a specific test:
+    python -m unittest tests.test_linked_list_core.TestLinkedListCore.test_append_increases_length
+"""
+
 import os
 import sys
 import unittest
@@ -10,7 +21,24 @@ if repo_root not in sys.path:
 from src.utils.linked_list import LinkedList
 
 
-class TestLinkedList(unittest.TestCase):
+class TestLinkedListCore(unittest.TestCase):
+    def test_append_increases_length(self):
+        ll = LinkedList()
+        ll.append(1)
+        self.assertEqual(ll.length(), 1)
+
+    def test_insert_top_places_at_head(self):
+        ll = LinkedList()
+        ll.append('a')
+        ll.insert_top('top')
+        self.assertEqual(ll.get_node_at(0).value, 'top')
+
+    def test_get_node_at_returns_correct_node(self):
+        ll = LinkedList()
+        ll.append(10)
+        ll.append(20)
+        self.assertEqual(ll.get_node_at(1).value, 20)
+
     def setUp(self):
         self.ll = LinkedList()
 

@@ -30,35 +30,7 @@ class Piece:
         self.color = random.randint(0, len(constants.COLORS) - 1) # pick random color
         self.rotation = 0 # start unrotated
 
-    def freeze(self, field) -> None:
-        """
-        Locks the piece into the game field and spawns a new one..
-        
-        Also checks for game over condition.
-
-        Args:
-            field: The game field grid.
-        """
-
-
-        for row in range(constants.GRID_SIZE):
-            for col in range(constants.GRID_SIZE):
-                index = row * constants.GRID_SIZE + col
-
-                if index in self.rotation:
-                    field_row = row + self.y
-                    field_col = col + self.x
-                    field[field_row][field_col] = self.color
-        # Attempt to break completed lines
-        field.break_lines()
-
-        # End game if new piece collides immediately
-        newPiece = Piece(x=constants.START_X, y=constants.START_Y)
-        
-        # Ending game if new piece immediately intersects
-        if newPiece.intersects(field):
-            field.game_over = True
-
+    #TODO: Maybe think about if moving these movement functions to board is better idea
     def go_space(self, field) -> None:
         """
         Drops the piece straight down until it collides, then freezes it.

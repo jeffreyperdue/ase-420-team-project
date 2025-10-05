@@ -135,7 +135,9 @@ class Board:
         # Filling in cells for the shape
         for grid_position in shape:
             coords = self.grid_position_to_coords(grid_position)
+            col = coords[0]
+            row = coords[1]
 
-            self.set_cell(coords[1], coords[0], piece.color)
+            self.set_cell(row, col, piece.color)
             
         return True

@@ -38,6 +38,10 @@ paginate: true
 - ✅ Define all piece shapes and rotation states in figure.py
 - ✅ Write unit tests to verify proper piece initialization
 - ✅ **BONUS**: Completed board collision detection methods
+- ✅ **ADDITIONAL**: Implement logic for movement
+- ✅ **ADDITIONAL**: Implement rotation logic using rotation states from figures.py
+- ✅ **ADDITIONAL**: Add unit tests to cover basic movement and rotation scenarios
+- ❌ **PENDING**: Ensure piece state updates correctly after each action (move or rotate)
 
 ---
 
@@ -55,11 +59,24 @@ paginate: true
   - `tests/test_row_core.py`: 30 (updated tests)
   - `tests/test_row_edge_cases.py`: 32 (new edge case tests)
 
-- **Cody**: 66 LoC total
-  - `src/game/piece.py`: 66 (piece implementation)
-  - `tests/test_piece.py`: 20 (unit tests)
+- **Cody**: 1,016 LoC total
+  - `src/constants.py`: 28 (game constants)
+  - `src/figures.py`: 16 (piece definitions)
+  - `src/game/board.py`: 160 (movement & rotation logic)
+  - `src/game/game.py`: 30 (game state management)
+  - `src/game/piece.py`: 26 (piece class updates)
+  - `src/game/row.py`: 71 (row operations)
+  - `src/starter_code/tetris_code_explained.py`: 187 (documentation)
+  - `src/starter_code/tetris_ver1.py`: 178 (reference implementation)
+  - `src/utils/linked_list.py`: 44 (utility updates)
+  - `src/view/input.py`: 18 (input handling)
+  - `src/view/pygame_renderer.py`: 34 (rendering updates)
+  - `tests/test_board.py`: 86 (board tests)
+  - `tests/test_linked_list.py`: 35 (linked list tests)
+  - `tests/test_piece.py`: 76 (piece tests)
+  - `tests/test_row.py`: 27 (row tests)
 
-**Total**: 292 lines of code
+**Total**: 1,242 lines of code
 
 ---
 
@@ -67,12 +84,12 @@ paginate: true
 
 ### Week 4 Performance
 - **Anna**: 100% total (3/3 goals completed)
-- **Cody**: 100% total (3/3 goals completed)
+- **Cody**: 75% total (3/4 goals completed, 1 pending)
 - **~14% per day** progress rate
-- **Perfect milestone alignment**
+- **Strong milestone alignment**
 
 ### Sprint 1 Progress  
-- **70% total** (7/10 milestones completed)
+- **69% total** (9/13 milestones completed)
 - **23% per week** average
 - **~3.3% per day** overall progress
 
@@ -91,6 +108,10 @@ paginate: true
 - **Collision Detection**: Board integration for piece placement and collision checking
 - **Shape Definition**: All Tetris pieces defined with rotation states
 - **Unit Testing**: Comprehensive test coverage for piece functionality
+- **Movement Logic**: Complete implementation of piece movement functions in board class
+- **Rotation Logic**: Full rotation system using rotation states from figures.py
+- **Integration**: Movement and rotation functions moved to board class for better architecture
+- **Bug Fixes**: Fixed grid_position_to_coords bug causing incorrect piece placement
 
 ---
 
@@ -131,7 +152,7 @@ def _check_column_index(self, col):
 
 ### 3. Piece Class Implementation
 ```python
-# src/game/piece.py - 66 LoC
+# src/game/piece.py - 26 LoC (updated)
 class Piece:
     def __init__(self, piece_type, x, y, rotation=0):
         self.piece_type = piece_type
@@ -143,20 +164,44 @@ class Piece:
 - **Encapsulation**: Complete piece state management
 - **Integration**: Ready for board collision detection
 - **Extensibility**: Support for all Tetris piece types
+- **Architecture**: Movement and rotation logic moved to board class
+- **State Management**: Piece instance passed to board methods for operations
 
 ---
 
-### 4. Comprehensive Testing Strategy
+### 4. Movement & Rotation Architecture
+```python
+# src/game/board.py - 160 LoC (updated)
+class Board:
+    def move_piece(self, piece, direction):
+        # Movement logic with collision detection
+        # Piece instance passed as parameter
+        
+    def rotate_piece(self, piece, direction):
+        # Rotation logic using figures.py states
+        # Visual state updated after rotation
+        
+    def grid_position_to_coords(self, row, col):
+        # Fixed bug causing incorrect piece placement
+```
+- **Architecture**: Movement/rotation functions moved to board class
+- **Integration**: Piece instances passed to board methods
+- **State Management**: Visual state updated after each action
+- **Bug Fixes**: Corrected coordinate conversion issues
+
+### 5. Comprehensive Testing Strategy
 ```python
 # Separated core and edge case tests
 tests/test_board_core.py          # 88 LoC - Core functionality
 tests/test_board_edge_cases.py    # 101 LoC - Error conditions
 tests/test_linked_list_core.py    # 57 LoC - Basic operations
 tests/test_linked_list_edge_cases.py # 37 LoC - Exception handling
+tests/test_piece.py               # 76 LoC - Movement & rotation tests
 ```
 - **Separation**: Fast core tests vs comprehensive edge case tests
 - **Coverage**: 100% test coverage for all new functionality
 - **Quality**: 41 passing tests with comprehensive scenarios
+- **Movement Testing**: Unit tests for movement and rotation scenarios
 
 ---
 
@@ -219,16 +264,17 @@ def get_cell(self, row, col):
 ## Performance Metrics
 
 ### Development Velocity
-- **Week 4**: 292 LoC in 7 days = **42 LoC/day**
+- **Week 4**: 1,242 LoC in 7 days = **177 LoC/day**
 - **Sprint Average**: 23% milestone completion per week
 - **Quality**: 100% test coverage maintained
 - **Reliability**: 41/41 tests passing
 
 ### Code Distribution
-- **Core Logic**: 35% (board, piece, row enhancements)
-- **Testing**: 40% (comprehensive test suite expansion)
-- **Error Handling**: 15% (validation and exception handling)
-- **Documentation**: 10% (code comments and API docs)
+- **Core Logic**: 45% (board, piece, row, movement, rotation enhancements)
+- **Testing**: 25% (comprehensive test suite expansion)
+- **Starter Code**: 20% (reference implementations and documentation)
+- **Error Handling**: 5% (validation and exception handling)
+- **Documentation**: 5% (code comments and API docs)
 
 ---
 
@@ -248,6 +294,12 @@ def get_cell(self, row, col):
 - **Challenge**: Ensuring compatibility between components
 - **Solution**: Factory pattern and clear API contracts
 - **Result**: Ready for seamless integration
+
+### 4. Movement & Rotation Integration
+- **Challenge**: Integrating movement/rotation into main game loop
+- **Solution**: Architecture refactoring with board-based operations
+- **Result**: Core logic complete, pending final integration
+- **Note**: Manual testing integration deferred due to midterm preparation
 
 ---
 
@@ -281,7 +333,7 @@ def get_cell(self, row, col):
 
 ### Team Positioning for Week 5
 - **Anna**: Advanced board system with robust error handling ready for integration
-- **Cody**: Complete piece system with collision detection ready for movement logic
+- **Cody**: Complete piece system with movement/rotation logic ready for final integration
 - **Owen**: Input system complete, ready for main loop integration
 - **Overall**: Strong foundation for final integration and polish phase
 

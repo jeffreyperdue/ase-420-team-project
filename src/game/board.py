@@ -58,6 +58,10 @@ class Board:
         node = self._rows.get_node_at(row)  # Retrieve the Row node at the specified row index
         node.value.set_bit(col, color)      # Set the bit at column index and store the color
 
+    def clear_cell(self, row, col) -> None:
+        node = self._rows.get_node_at(row)
+        node.value.clear_bit(col)
+
     def clear_full_lines(self) -> None:
         """
         Remove all full rows from the board and insert empty rows
@@ -89,8 +93,8 @@ class Board:
         
         Args:
             position (int): Position within the 4x4 grid (0 to 15)
-            piece_x (int): The x-coordinate of the piece on the board
-            piece_y (int): The y-coordinate of the piece on the board
+            x (int): The x-coordinate of the piece on the board
+            y (int): The y-coordinate of the piece on the board
 
         Returns:
             tuple: (col, row) on the board
@@ -115,6 +119,10 @@ class Board:
             col = coords[0]
             row = coords[1]
 
+            # Checking if within bounds of board
+            if row < 0 or row >= self.get_height() or col < 0 or col >= self.get_width():
+                return True
+
             if self.get_cell(row, col):
                 return True
             
@@ -127,7 +135,15 @@ class Board:
         Returns:
             bool: True if placement was successful, False if collision was detected
         """
-        
+
+        # Checking if this piece has already been placed and removing cells if it has
+        if piece.cells:
+            for cell in piece.cells:
+                col = cell[0]
+                row = cell[1]
+
+                self.clear_cell(row, col)
+
         # Checking if new piece will collide with other pieces or end of board
         if (self.will_piece_collide(piece)):
             return False
@@ -135,16 +151,18 @@ class Board:
         # Getting tuple that represents shape of piece to be placed
         shape = SHAPES[piece.type][piece.rotation]
 
+        # Clearing out list of cells for piece
+        piece.cells.clear()
+
         # Filling in cells for the shape
         for grid_position in shape:
             coords = self.grid_position_to_coords(grid_position, piece.x, piece.y)
             col = coords[0]
             row = coords[1]
-            print("Column: " + str(col))
-            print("Row: " + str(row))
+            
+            piece.cells.append((col, row))
 
             self.set_cell(row, col, piece.color)
-            
         return True
     
     def go_space(self, piece) -> None:
@@ -154,22 +172,29 @@ class Board:
         Args:
             piece: The piece to be moved.
         """
-
         while not self.will_piece_collide(piece):
             piece.y += 1
         piece.y -= 1
-    
-    def go_down(self, piece) -> None:
-        """
-        Moves the piece one row down. If it collides, revert it.
+        self.place_piece(piece)
 
-        Args:
-            piece: The piece to be moved.
+    def go_down(self, piece) -> bool:
         """
+        Moves the piece one row down. If it collides, revert it and place it.
+        
+        Returns:
+            bool: True if moved successfully, False if it hit and was placed.
+        """
+
+
 
         piece.y += 1
         if self.will_piece_collide(piece):
             piece.y -= 1
+            self.place_piece(piece)
+            return False
+        self.place_piece(piece)
+        return True
+
 
     def go_side(self, x_movement, piece) -> None:
         """
@@ -179,11 +204,11 @@ class Board:
             x_movement (int): Movement in X direction (-1 for left, 1 for right).
             piece: The piece to be moved.
         """
-
-        oldX = piece.x
         piece.x += x_movement
         if self.will_piece_collide(piece):
-            piece.x = oldX
+            piece.x -= x_movement
+        self.place_piece(piece)
+
 
     def rotate(self, piece) -> None:
         """
@@ -192,8 +217,8 @@ class Board:
         Args:
             piece: The piece to be rotated.
         """
-
-        oldRotation = piece.rotation
-        self.rotation = (piece.rotation + 1) % len(SHAPES[piece.type])
+        old_rotation = piece.rotation
+        piece.rotation = (piece.rotation + 1) % len(SHAPES[piece.type])
         if self.will_piece_collide(piece):
-            piece.rotation = oldRotation
+            piece.rotation = old_rotation
+        self.place_piece(piece)

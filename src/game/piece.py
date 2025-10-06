@@ -29,3 +29,4 @@ class Piece:
         self.type = random.randint(0, len(figures.SHAPES) - 1) # pick random shape
         self.color = random.randint(1, len(constants.COLORS) - 1) # pick random color
         self.rotation = 0 # start unrotated
+        self.cells = [] # empty since no cells filled in yet

@@ -82,17 +82,20 @@ class Board:
         for _ in range(self.get_height() - self._rows.length()):
             self._rows.insert_top(Row())
 
-    def grid_position_to_coords(self, position) -> tuple:
+    def grid_position_to_coords(self, position, x, y) -> tuple:
         """
-        Convert the given grid position for the piece cell position into coordinates to be placed on board
-        Example: 1 -> (4, 0)
+        Convert the given grid position for the piece cell position into board coordinates,
+        applying the piece's position offset.
         
+        Args:
+            position (int): Position within the 4x4 grid (0 to 15)
+            piece_x (int): The x-coordinate of the piece on the board
+            piece_y (int): The y-coordinate of the piece on the board
+
         Returns:
-            tuple: Tuple that represents coordinates of cell converted from the grid index
-
+            tuple: (col, row) on the board
         """
-
-        return (position % 4, position // 4)
+        return (x + (position % 4), y + (position // 4))
 
     def will_piece_collide(self, piece) -> bool:
         """
@@ -108,7 +111,7 @@ class Board:
 
         # Going through each cell in the piece to be placed and ensuring that will not collide with other piece or end of board
         for grid_position in shape:
-            coords = self.grid_position_to_coords(grid_position)
+            coords = self.grid_position_to_coords(grid_position, piece.x, piece.y)
             col = coords[0]
             row = coords[1]
 
@@ -134,9 +137,11 @@ class Board:
 
         # Filling in cells for the shape
         for grid_position in shape:
-            coords = self.grid_position_to_coords(grid_position)
+            coords = self.grid_position_to_coords(grid_position, piece.x, piece.y)
             col = coords[0]
             row = coords[1]
+            print("Column: " + str(col))
+            print("Row: " + str(row))
 
             self.set_cell(row, col, piece.color)
             

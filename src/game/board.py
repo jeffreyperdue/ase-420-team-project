@@ -151,8 +151,8 @@ class Board:
         """
 
         while not self.will_piece_collide(piece):
-            self.y += 1
-        self.y -= 1
+            piece.y += 1
+        piece.y -= 1
     
     def go_down(self, piece) -> None:
         """
@@ -162,9 +162,9 @@ class Board:
             piece: The piece to be moved.
         """
 
-        self.y += 1
+        piece.y += 1
         if self.will_piece_collide(piece):
-            self.y -= 1
+            piece.y -= 1
 
     def go_side(self, x_movement, piece) -> None:
         """
@@ -175,10 +175,10 @@ class Board:
             piece: The piece to be moved.
         """
 
-        oldX = self.x
-        self.x += x_movement
+        oldX = piece.x
+        piece.x += x_movement
         if self.will_piece_collide(piece):
-            self.x = oldX
+            piece.x = oldX
 
     def rotate(self, piece) -> None:
         """
@@ -188,7 +188,7 @@ class Board:
             piece: The piece to be rotated.
         """
 
-        oldRotation = self.rotation
-        self.rotation = (self.rotation + 1) % len(SHAPES[self.type])
+        oldRotation = piece.rotation
+        self.rotation = (piece.rotation + 1) % len(SHAPES[piece.type])
         if self.will_piece_collide(piece):
-            self.rotation = oldRotation
+            piece.rotation = oldRotation

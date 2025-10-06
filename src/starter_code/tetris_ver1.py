@@ -222,9 +222,9 @@ def main():
                 if event.key == pygame.K_UP:
                     GameBoard.rotate(currentPiece)
                 if event.key == pygame.K_LEFT:
-                    GameBoard.go_side(-1)
+                    GameBoard.go_side(-1, currentPiece)
                 if event.key == pygame.K_RIGHT:
-                    GameBoard.go_side(1)
+                    GameBoard.go_side(1, currentPiece)
                 if event.key == pygame.K_SPACE:
                     GameBoard.go_space()
                 if event.key == pygame.K_DOWN:

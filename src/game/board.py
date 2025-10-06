@@ -141,3 +141,54 @@ class Board:
             self.set_cell(row, col, piece.color)
             
         return True
+    
+    def go_space(self, piece) -> None:
+        """
+        Drops the piece straight down until it collides, then freezes it.
+
+        Args:
+            piece: The piece to be moved.
+        """
+
+        while not self.will_piece_collide(piece):
+            self.y += 1
+        self.y -= 1
+    
+    def go_down(self, piece) -> None:
+        """
+        Moves the piece one row down. If it collides, revert it.
+
+        Args:
+            piece: The piece to be moved.
+        """
+
+        self.y += 1
+        if self.will_piece_collide(piece):
+            self.y -= 1
+
+    def go_side(self, x_movement, piece) -> None:
+        """
+        Moves the piece left or right, reverting if it causes a collision.
+
+        Args:
+            x_movement (int): Movement in X direction (-1 for left, 1 for right).
+            piece: The piece to be moved.
+        """
+
+        oldX = self.x
+        self.x += x_movement
+        if self.will_piece_collide(piece):
+            self.x = oldX
+
+    def rotate(self, piece) -> None:
+        """
+        Rotates the piece clockwise. If rotation causes collision, reverts it.
+
+        Args:
+            piece: The piece to be rotated.
+        """
+
+        oldRotation = self.rotation
+        self.rotation = (self.rotation + 1) % len(SHAPES[self.type])
+        if self.will_piece_collide(piece):
+            self.rotation = oldRotation

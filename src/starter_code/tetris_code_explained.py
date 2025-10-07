@@ -2,14 +2,13 @@ import pygame
 import random
 import os
 import sys
-
 # Ensure repository root is on sys.path so imports work when running from starter_code
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
-
-# Import Board class from src/game/board.py
 from src.game.board import Board
+from src.game.row import Row
+import src.constants as constants
 
 # ===========================
 # COLORS
@@ -66,6 +65,10 @@ Rotation = 0  # Which rotation is used
 
 State = "start" # Game state: "start" (playing) or "gameover"
 
+# Dimensions of the playing grid
+Height = 20
+Width = 10
+
 # Where on the screen to start drawing the board
 StartX = 100
 StartY = 60
@@ -76,6 +79,9 @@ Tzoom = 20
 # Current piece’s position on the grid
 ShiftX = 0  # left/right
 ShiftY = 0  # up/down
+
+# Encapsulated Board (created in initialize)
+GameBoard = None
 
 # Encapsulated Board (created in initialize)
 GameBoard = None
@@ -105,44 +111,48 @@ def intersects(image):
         for j in range(4):          # columns in 4x4 mini-grid
             if i * 4 + j in image: # if this square is part of the shape
                 # Check boundaries and if cell is already filled
+                # If GameBoard not yet created, fall back to previous globals
+                if GameBoard is None:
+                    if i + ShiftY > Height - 1 or \
+                       j + ShiftX > Width - 1 or \
+                       j + ShiftX < 0 or \
+                       Field[i + ShiftY][j + ShiftX] > 0:
+                        intersection = True
+                else:
+                    if (i + ShiftY) >= GameBoard.height or \
+                       (j + ShiftX) >= GameBoard.width or \
+                       (j + ShiftX) < 0 or \
+                       GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
+
+    for i in range(4):
+        for j in range(4):
+            if i * 4 + j in image:
+                # out of bounds
+                # code smell - confusing, why Y is related i and X is related j?
+
                 if GameBoard is None or \
-                   (i + ShiftY) >= GameBoard.get_height() or \
-                   (j + ShiftX) >= GameBoard.get_width() or \
+                   (i + ShiftY) >= GameBoard.height or \
+                   (j + ShiftX) >= GameBoard.width or \
                    (j + ShiftX) < 0 or \
-                   GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
+                   GameBoard.cell(i + ShiftY, j + ShiftX) > 0:\
                         intersection = True
     return intersection
-
-# =============================
-# FIGURE TO BITBOARD CONVERSION
-# =============================
-def figure_to_bitboard(image):
-    """
-    Convert a flat 4x4 shape representation into bitboard rows.
-
-    Args:
-        image (list[int]): A list of indices (0–15) representing filled cells in a 4x4 grid.
-
-    Returns:
-        list[int]: A list of 4 integers, each representing a row in bitboard format.
-        Example: [0b0000, 0b1110, 0b0100, 0b0000] for a T shape
-    """
-
-    rows = [0] * 4 # Initialize 4 empty rows (bitboards)
-    for index in image:
-        row, col = divmod(index, 4) # Convert flat index to its corresponding (row, column) coordinates
-        rows[row] |= (1 << col) # Set the bit at col in row
-    return rows # Return the 4-row bitboard representation
 
 # ===========================
 # FREEZE (lock piece in place)
 # ===========================
 def freeze(image):
     # code smell - can you guess what it does? why there is no comments on what it does, how, and why?
-    global State
+    global State, GameBoard
+    if GameBoard is None:
+        # Nothing to write to
+        return
     
-    piece_rows = figure_to_bitboard(image) # Convert figure to bitboard rows
-    GameBoard.place_piece_rows(piece_rows, ShiftX, ShiftY, Color) # Place piece on the board
+    for i in range(4):
+        for j in range(4):
+            if i * 4 + j in image:
+                GameBoard.set_cell(i + ShiftY, j + ShiftX, Color)
+    
     GameBoard.clear_full_lines() # clear any filled lines
     make_figure(3, 0) # spawn a new piece at top
 
@@ -195,13 +205,13 @@ def draw_board(screen, x, y, zoom):
     # Draw using GameBoard
     if GameBoard is None:
         return
-    for i in range(GameBoard.get_height()):
-        for j in range(GameBoard.get_width()):
+    for i in range(GameBoard.height):
+        for j in range(GameBoard.width):
             # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
             
             # draw filled block if > 0
-            val = GameBoard.get_cell(i, j)
+            val = GameBoard.cell(i, j)
             if val > 0:
                 pygame.draw.rect(screen, Colors[val],
                                     [x + zoom * j + 1, y + zoom * i + 1,
@@ -221,13 +231,16 @@ def draw_figure(screen, image, x, y, shift_x, shift_y, zoom):
 # ===========================
 # INITIALIZATION
 # ===========================
-def initialize():
+def initialize(height, width):
     """Initialize game state and create empty board."""
     global State, GameBoard
 
     # Create an encapsulated GameBoard and initialize it
-    GameBoard = Board()
+    GameBoard = Board(row_factory=lambda: Row(constants.WIDTH))
     
+    # Clear the board to ensure it's empty
+    GameBoard.clear()
+
     State  = "start"
 
 # ===========================
@@ -246,7 +259,7 @@ def main():
     pressing_down = False
 
     # Start game
-    initialize()
+    initialize(Height, Width)  # Height: # of rows, Width: # of columns
     make_figure(3, 0)   # spawn first piece
     done = False
     level = 1

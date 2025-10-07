@@ -11,6 +11,9 @@ if repo_root not in sys.path:
 # Import Board class from src/game/board.py
 from src.game.board import Board
 
+# Import Piece class from src/game/piece.py
+from src.game.piece import Piece
+
 # Global constants - it's OK as it's read only
 # code smell - why list when tuple (immutable) is OK? Use immutable objects as much as possible
 Colors = [
@@ -199,7 +202,7 @@ def main():
     pressing_down = False
 
     initialize()
-    make_figure(3,0)
+    currentPiece = Piece(3, 0)
     done = False
     level = 1
     while not done:
@@ -210,20 +213,20 @@ def main():
         # Check if we need to automatically go down
         if counter % (fps // 2 // level) == 0 or pressing_down: 
             if State == "start":
-                go_down()
+                GameBoard.go_down(currentPiece)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    rotate()
+                    GameBoard.rotate(currentPiece)
                 if event.key == pygame.K_LEFT:
-                    go_side(-1)
+                    GameBoard.go_side(-1, currentPiece)
                 if event.key == pygame.K_RIGHT:
-                    go_side(1)
+                    GameBoard.go_side(1, currentPiece)
                 if event.key == pygame.K_SPACE:
-                    go_space()
+                    GameBoard.go_space()
                 if event.key == pygame.K_DOWN:
                     pressing_down = True
 
@@ -233,7 +236,8 @@ def main():
         draw_board(screen, StartX, StartY, Tzoom)
         
         # code smell - how many values duplication Figures[Type][Rotation]
-        draw_figure(screen, Figures[Type][Rotation], StartX, StartY, ShiftX, ShiftY, Tzoom)
+        # draw_figure(screen, Figures[currentPiece.type][currentPiece.rotation], StartX, StartY, ShiftX, ShiftY, Tzoom)
+        GameBoard.place_piece(currentPiece)
 
         if State == "gameover":
             done = True

@@ -72,6 +72,16 @@ class Row:
     self.__bits |= (1 << col) # Set the bit at position col to 1
     self.__colors[col] = color  # Store the color for that cell
 
+  def clear_bit(self, col) -> None:
+    """
+    Clears the bit at column `col` and removes the associated color.
+
+    Args:
+        col (int): Column index to clear.
+    """
+    self.__bits &= ~(1 << col)  # Unset the bit at position `col`
+    self.__colors.pop(col, None)  # Remove color if it exists
+
   def get_color(self, col):
     """
       Retrieves the color at column col.

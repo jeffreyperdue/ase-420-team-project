@@ -4,6 +4,7 @@ from src.utils.linked_list import LinkedList    # Import the LinkedList class to
 # Import playing board/grid dimensions from src/constants.py
 from src.constants import HEIGHT, WIDTH     # Import board dimensions from a shared constants file
 
+from src.figures import SHAPES
 class Board:
     """
         Encapsulates the playing field grid and related operations
@@ -57,6 +58,10 @@ class Board:
         node = self._rows.get_node_at(row)  # Retrieve the Row node at the specified row index
         node.value.set_bit(col, color)      # Set the bit at column index and store the color
 
+    def clear_cell(self, row, col) -> None:
+        node = self._rows.get_node_at(row)
+        node.value.clear_bit(col)
+
     def clear_full_lines(self) -> None:
         """
         Remove all full rows from the board and insert empty rows
@@ -81,10 +86,139 @@ class Board:
         for _ in range(self.get_height() - self._rows.length()):
             self._rows.insert_top(Row())
 
-    def check_collision(self, piece_rows, col, row):
-        """Stub for collision detection — to be implemented by teammates."""
-        raise NotImplementedError("check_collision() is not implemented yet")
+    def grid_position_to_coords(self, position, x, y) -> tuple:
+        """
+        Convert the given grid position for the piece cell position into board coordinates,
+        applying the piece's position offset.
+        
+        Args:
+            position (int): Position within the 4x4 grid (0 to 15)
+            x (int): The x-coordinate of the piece on the board
+            y (int): The y-coordinate of the piece on the board
 
-    def place_piece_rows(self, piece_rows, col, row, color):
-        """Stub for piece placement — to be implemented by teammates."""
-        raise NotImplementedError("place_piece_rows() is not implemented yet")
+        Returns:
+            tuple: (col, row) on the board
+        """
+        return (x + (position % 4), y + (position // 4))
+
+    def will_piece_collide(self, piece) -> bool:
+        """
+        Check if placing the given piece at (col, row) would collide
+        with existing occupied cells on the board.
+
+        Returns:
+            bool: True if piece will collide with other piece, False if not
+        """
+
+        # Getting tuple that represents shape of piece to be placed
+        shape = SHAPES[piece.type][piece.rotation]
+
+        # Going through each cell in the piece to be placed and ensuring that will not collide with other piece or end of board
+        for grid_position in shape:
+            coords = self.grid_position_to_coords(grid_position, piece.x, piece.y)
+            col = coords[0]
+            row = coords[1]
+
+            # Checking if within bounds of board
+            if row < 0 or row >= self.get_height() or col < 0 or col >= self.get_width():
+                return True
+
+            if self.get_cell(row, col):
+                return True
+            
+        return False
+
+    def place_piece(self, piece) -> bool:
+        """
+        Placing piece cells on the rows needed based on piece passed into method, also setting color of each cell in rows.
+
+        Returns:
+            bool: True if placement was successful, False if collision was detected
+        """
+
+        # Checking if this piece has already been placed and removing cells if it has
+        if piece.cells:
+            for cell in piece.cells:
+                col = cell[0]
+                row = cell[1]
+
+                self.clear_cell(row, col)
+
+        # Checking if new piece will collide with other pieces or end of board
+        if (self.will_piece_collide(piece)):
+            return False
+        
+        # Getting tuple that represents shape of piece to be placed
+        shape = SHAPES[piece.type][piece.rotation]
+
+        # Clearing out list of cells for piece
+        piece.cells.clear()
+
+        # Filling in cells for the shape
+        for grid_position in shape:
+            coords = self.grid_position_to_coords(grid_position, piece.x, piece.y)
+            col = coords[0]
+            row = coords[1]
+            
+            piece.cells.append((col, row))
+
+            self.set_cell(row, col, piece.color)
+        return True
+    
+    def go_space(self, piece) -> None:
+        """
+        Drops the piece straight down until it collides, then freezes it.
+
+        Args:
+            piece: The piece to be moved.
+        """
+        while not self.will_piece_collide(piece):
+            piece.y += 1
+        piece.y -= 1
+        self.place_piece(piece)
+
+    def go_down(self, piece) -> bool:
+        """
+        Moves the piece one row down. If it collides, revert it and place it.
+        
+        Returns:
+            bool: True if moved successfully, False if it hit and was placed.
+        """
+
+
+
+        piece.y += 1
+        if self.will_piece_collide(piece):
+            piece.y -= 1
+            self.place_piece(piece)
+            return False
+        self.place_piece(piece)
+        return True
+
+
+    def go_side(self, x_movement, piece) -> None:
+        """
+        Moves the piece left or right, reverting if it causes a collision.
+
+        Args:
+            x_movement (int): Movement in X direction (-1 for left, 1 for right).
+            piece: The piece to be moved.
+        """
+        piece.x += x_movement
+        if self.will_piece_collide(piece):
+            piece.x -= x_movement
+        self.place_piece(piece)
+
+
+    def rotate(self, piece) -> None:
+        """
+        Rotates the piece clockwise. If rotation causes collision, reverts it.
+
+        Args:
+            piece: The piece to be rotated.
+        """
+        old_rotation = piece.rotation
+        piece.rotation = (piece.rotation + 1) % len(SHAPES[piece.type])
+        if self.will_piece_collide(piece):
+            piece.rotation = old_rotation
+        self.place_piece(piece)

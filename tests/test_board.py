@@ -19,7 +19,9 @@ if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
 
 from src.game.board import Board
+from src.game.piece import Piece
 from src.constants import HEIGHT, WIDTH
+from src.figures import SHAPES
 
 
 class TestBoard(unittest.TestCase):
@@ -95,6 +97,41 @@ class TestBoard(unittest.TestCase):
         self.board.clear_full_lines()
         self.assertEqual(sum(1 for i in range(h) if any(self.board.get_cell(i, j) for j in range(w))), 0)
 
+    def test_will_piece_collide(self):
+        pieceToCollide = Piece(2, 5)
+
+        collisionTestPieceX = Piece(2, 0)
+
+        # Checking if collision on x axis
+        self.board.place_piece(collisionTestPieceX)
+        self.assertTrue(self.board.will_piece_collide(pieceToCollide))
+
+        collisionTestPieceY = Piece(0, 5)
+
+        # Checking if collision on y axis
+        self.board.place_piece(collisionTestPieceY)
+        self.assertTrue(self.board.will_piece_collide(pieceToCollide))
+
+        # Clearing board and checking if collision on empty board
+        self.board.clear()
+
+        pieceNoCollision = Piece(2, 5)
+        self.assertFalse(self.board.will_piece_collide(pieceNoCollision))
+
+    def test_place_piece(self):
+        # Creating and placing piece
+        testPiece = Piece(3, 5)
+        self.board.place_piece(testPiece)
+
+        shape = SHAPES[testPiece.type][testPiece.rotation]
+
+        # Checking if each cell has been filled in for piece
+        for grid_position in shape:
+            coords = self.board.grid_position_to_coords(grid_position)
+            col = coords[0]
+            row = coords[1]
+
+            self.assertTrue(self.board.get_cell(row, col))
 
 if __name__ == '__main__':
     unittest.main()

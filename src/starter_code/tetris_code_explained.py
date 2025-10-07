@@ -122,19 +122,7 @@ def intersects(image):
                     if (i + ShiftY) >= GameBoard.height or \
                        (j + ShiftX) >= GameBoard.width or \
                        (j + ShiftX) < 0 or \
-                       GameBoard.cell(i + ShiftY, j + ShiftX) > 0:
-
-    for i in range(4):
-        for j in range(4):
-            if i * 4 + j in image:
-                # out of bounds
-                # code smell - confusing, why Y is related i and X is related j?
-
-                if GameBoard is None or \
-                   (i + ShiftY) >= GameBoard.height or \
-                   (j + ShiftX) >= GameBoard.width or \
-                   (j + ShiftX) < 0 or \
-                   GameBoard.cell(i + ShiftY, j + ShiftX) > 0:\
+                       GameBoard.get_cell(i + ShiftY, j + ShiftX) > 0:
                         intersection = True
     return intersection
 

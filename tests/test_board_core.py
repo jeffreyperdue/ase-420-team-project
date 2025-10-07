@@ -131,44 +131,61 @@ class TestBoardCore(unittest.TestCase):
     def test_will_piece_collide(self):
         """Test piece collision detection functionality from Cody's implementation."""
         from src.game.piece import Piece
+        from src.game.row import Row
         
-        pieceToCollide = Piece(2, 5)
-        collisionTestPieceX = Piece(2, 0)
+        # Create a full-size board for Cody's collision tests
+        def full_row_factory():
+            return Row(constants.WIDTH)
+        
+        full_board = Board(full_row_factory, height=constants.HEIGHT, width=constants.WIDTH)
+        
+        # Create pieces that will actually collide - use same position for guaranteed collision
+        pieceToCollide = Piece(2, 4)
+        collisionTestPieceX = Piece(2, 4)  # Same position - guaranteed collision
 
-        # Checking if collision on x axis
-        self.board.place_piece(collisionTestPieceX)
-        self.assertTrue(self.board.will_piece_collide(pieceToCollide))
+        # Checking if collision on x axis (pieces at same position)
+        full_board.place_piece(collisionTestPieceX)
+        self.assertTrue(full_board.will_piece_collide(pieceToCollide))
 
-        collisionTestPieceY = Piece(0, 5)
+        # Clear and test y-axis collision
+        full_board.clear()
+        collisionTestPieceY = Piece(2, 4)  # Same position again
 
         # Checking if collision on y axis
-        self.board.place_piece(collisionTestPieceY)
-        self.assertTrue(self.board.will_piece_collide(pieceToCollide))
+        full_board.place_piece(collisionTestPieceY)
+        self.assertTrue(full_board.will_piece_collide(pieceToCollide))
 
         # Clearing board and checking if collision on empty board
-        self.board.clear()
+        full_board.clear()
 
         pieceNoCollision = Piece(2, 5)
-        self.assertFalse(self.board.will_piece_collide(pieceNoCollision))
+        self.assertFalse(full_board.will_piece_collide(pieceNoCollision))
 
     def test_place_piece(self):
         """Test piece placement functionality from Cody's implementation."""
         from src.game.piece import Piece
         from src.figures import SHAPES
+        from src.game.row import Row
+        
+        # Create a full-size board for Cody's piece placement tests
+        def full_row_factory():
+            return Row(constants.WIDTH)
+        
+        full_board = Board(full_row_factory, height=constants.HEIGHT, width=constants.WIDTH)
         
         # Creating and placing piece
         testPiece = Piece(3, 5)
-        self.board.place_piece(testPiece)
+        full_board.place_piece(testPiece)
 
         shape = SHAPES[testPiece.type][testPiece.rotation]
 
         # Checking if each cell has been filled in for piece
         for grid_position in shape:
-            coords = self.board.grid_position_to_coords(grid_position, testPiece.x, testPiece.y)
+            coords = full_board.grid_position_to_coords(grid_position, testPiece.x, testPiece.y)
             col = coords[0]
             row = coords[1]
 
-            self.assertTrue(self.board.get_cell(row, col))
+            self.assertTrue(full_board.get_cell(row, col))
 
     def test_grid_position_to_coords(self):
         """Test coordinate conversion functionality from Cody's implementation."""

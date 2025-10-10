@@ -160,8 +160,8 @@ def draw_board(screen, x, y, zoom):
     # Draw using GameBoard
     if GameBoard is None:
         return
-    for i in range(GameBoard.get_height()):
-        for j in range(GameBoard.get_width()):
+    for i in range(GameBoard.height):
+        for j in range(GameBoard.width):
             # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
             

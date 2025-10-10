@@ -1,4 +1,11 @@
 import pygame
+import os
+import sys
+# Ensure repository root is on sys.path so imports work when running from starter_code
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
+
 from src.constants import SCREEN_SIZE, FPS
 from src.view.pygame_renderer import PygameRenderer
 from src.view.input import InputHandler

@@ -11,11 +11,13 @@ if repo_root not in sys.path:
 from src.game.piece import Piece
 from src.game.board import Board
 from src.figures import SHAPES
+from src.constants import HEIGHT, WIDTH
 
 class TestPiece(unittest.TestCase):
     def setUp(self):
         """Set up test environment before each test."""
-        self.board = Board()
+        from src.game.row import Row
+        self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
         
     @patch('src.game.piece.random.randint')
     def test_piece_initalization(self, mock_randint): 

@@ -12,8 +12,8 @@ from src.game.row import Row
 
 class TestRow(unittest.TestCase):
     def setUp(self):
-        Row.set_mask(5)  # small width for tests
-        self.row = Row()
+        # New API: construct Row with explicit width
+        self.row = Row(5)
 
     def test_mask_and_bits(self):
         # Initially empty

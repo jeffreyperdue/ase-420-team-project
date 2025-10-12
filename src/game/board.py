@@ -229,7 +229,6 @@ class Board:
             piece.y -= 1
             self.place_piece(piece)
             return False
-        self.place_piece(piece)
         return True
 
     def go_side(self, x_movement, piece) -> None:
@@ -243,7 +242,7 @@ class Board:
         piece.x += x_movement
         if self.will_piece_collide(piece):
             piece.x -= x_movement
-        self.place_piece(piece)
+        
 
     def rotate(self, piece) -> None:
         """
@@ -256,4 +255,4 @@ class Board:
         piece.rotation = (piece.rotation + 1) % len(SHAPES[piece.type])
         if self.will_piece_collide(piece):
             piece.rotation = old_rotation
-        self.place_piece(piece)
+        

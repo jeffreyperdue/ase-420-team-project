@@ -10,7 +10,8 @@ class InputHandler:
             pygame.K_RIGHT: "RIGHT",
             pygame.K_DOWN: "DOWN",
             pygame.K_SPACE: "DROP",
-            pygame.K_RETURN: "START"
+            pygame.K_RETURN: "START",
+            pygame.K_ESCAPE: "QUIT"
         }
 
     def get_intents(self, events):

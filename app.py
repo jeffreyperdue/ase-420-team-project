@@ -1,11 +1,11 @@
 import pygame
-from constants import WIDTH, SCREEN_SIZE, FPS
-from game.game import Game
-from game.board import Board
-from game.piece import Piece
-from game.row import Row
-from view.pygame_renderer import PygameRenderer
-from view.input import InputHandler
+from src.constants import WIDTH, SCREEN_SIZE, FPS
+from src.game.game import Game
+from src.game.board import Board
+from src.game.piece import Piece
+from src.game.row import Row
+from src.view.pygame_renderer import PygameRenderer
+from src.view.input import InputHandler
 
 def spawn_piece():
     """Simple function to spawn a new piece"""

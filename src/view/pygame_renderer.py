@@ -1,5 +1,5 @@
 import pygame
-from src.constants import WHITE, GRAY, Colors, CELL_SIZE
+from src.constants import COLORS, CELL_SIZE, WHITE, GRAY
 from src.figures import SHAPES
 
 class PygameRenderer:
@@ -28,12 +28,12 @@ class PygameRenderer:
                     if color is not None:
                         pygame.draw.rect(
                             self.screen,
-                            Colors[color],
+                            COLORS[color],
                             [rect[0] + 1, rect[1] + 1, CELL_SIZE - 2, CELL_SIZE - 2]
                         )
 
     def draw_piece(self, piece):
-        color = Colors[piece.color]
+        color = COLORS[piece.color]
         shape = SHAPES[piece.type][piece.rotation]
     
         for grid_position in shape:

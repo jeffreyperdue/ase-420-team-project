@@ -12,6 +12,8 @@ if repo_root not in sys.path:
 from src.game.board import Board
 # Import Piece class from src/game/piece.py
 from src.game.piece import Piece
+# Import PygameRenderer class from src/view/pygame_renderer.py
+from src.view.pygame_renderer import PygameRenderer
 # Import global constants
 import src.constants as constants
 
@@ -115,7 +117,16 @@ def freeze(image):
     global State
 
     piece_rows = figure_to_bitboard(image) # Convert figure to bitboard rows
-    GameBoard.place_piece_rows(piece_rows, ShiftX, ShiftY, Color) # Place piece on the board
+    
+    #CHANGE
+    # Create a temporary piece to place on the board
+    temp_piece = Piece(ShiftX, ShiftY)
+    temp_piece.type = Type
+    temp_piece.color = Color
+    temp_piece.rotation = Rotation
+    GameBoard.place_piece(temp_piece) # Place piece on the board
+
+    
     GameBoard.clear_full_lines() # clear any filled lines
     make_figure(3, 0) # spawn a new piece at top
     
@@ -165,11 +176,18 @@ def draw_board(screen, x, y, zoom):
             # draw grid outline
             pygame.draw.rect(screen, GRAY, [x + zoom * j, y + zoom * i, zoom, zoom], 1)
             
-            # draw filled block if > 0
-            val = GameBoard.get_cell(i, j)
-            if val > 0:
-                pygame.draw.rect(screen, Colors[val],
-                                [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
+            
+            #CHANGE
+            # draw filled block if occupied
+            if GameBoard.get_cell(i, j):
+                # Get the color from the row
+                row_obj = GameBoard.get_row_object(i)
+                color = row_obj.get_color(j)
+                if color is not None:
+                    pygame.draw.rect(screen, Colors[color],
+                                    [x + zoom * j + 1, y + zoom * i + 1, zoom - 2, zoom - 1])
+        
+        
 
 def draw_figure(screen, image, startX, startY, shiftX, shiftY, zoom):
     for i in range(4):
@@ -204,7 +222,20 @@ def main():
     pressing_down = False
 
     initialize()
+    
+    
+    
     currentPiece = Piece(3, 0)
+    #CHANGE
+    # Sync global variables to piece
+    currentPiece.x = ShiftX
+    currentPiece.y = ShiftY
+    currentPiece.type = Type
+    currentPiece.rotation = Rotation
+    currentPiece.color = Color
+    
+    
+    
     done = False
     level = 1
     while not done:
@@ -216,12 +247,30 @@ def main():
         if counter % (fps // 2 // level) == 0 or pressing_down: 
             if State == "start":
                 GameBoard.go_down(currentPiece)
+                
+                
+                
+                # Sync global variables to piece after movement
+                #CHANGE
+                currentPiece.x = ShiftX
+                currentPiece.y = ShiftY
+                currentPiece.type = Type
+                currentPiece.rotation = Rotation
+                currentPiece.color = Color
+                
+                
+                
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
+                    currentPiece.x = ShiftX
+                    currentPiece.y = ShiftY
+                    currentPiece.type = Type
+                    currentPiece.rotation = Rotation
+                    currentPiece.color = Color
                     GameBoard.rotate(currentPiece)
                 if event.key == pygame.K_LEFT:
                     GameBoard.go_side(-1, currentPiece)

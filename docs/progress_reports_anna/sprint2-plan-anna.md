@@ -24,7 +24,8 @@
      - 1.3. As a developer, I want to add multipliers for clearing multiple lines (2, 3, 4) so that the scoring system reflects increasing difficulty and rewards skilled play.
      - 1.4. As a developer, I want to integrate the scoring logic with the board so that points are only awarded after lines are validated and removed, ensuring accuracy.
      - 1.5. As a developer, I want to display the current score in the UI and persist it until reset so that players can see their progress throughout the game.
-     - 1.6. As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
+     - 1.6. As a developer, I want to display the high score of the current session in-game
+     - 1.7. As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
 
 ### Start Screen Requirements
 
@@ -63,7 +64,7 @@
 - Implement base scoring function (award points for clearing one line).
   - _Sub requirement 1.2_: As a developer, I want to implement a base scoring function that awards points for clearing one line so that the game has a foundation for tracking player progress.
 - Write initial unit tests for base scoring.
-  - _Sub requirement 1.6_: As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
+  - _Sub requirement 1.7_: As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
 
 ### Week 2 (10/27 - 11/2)
 
@@ -74,7 +75,7 @@
 - Integrate scoring logic with the board (trigger only after validated line removal).
   - _Sub requirement 1.4_: As a developer, I want to integrate the scoring logic with the board so that points are only awarded after lines are validated and removed, ensuring accuracy.
 - Expand unit tests to cover multipliers and edge cases.
-  - _Sub requirement 1.6_: As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
+  - _Sub requirement 1.7_: As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
 
 ### Week 3 (11/3 - 11/9)
 
@@ -83,9 +84,9 @@
 - Display current score in the UI and persist until reset.
   - _Sub requirement 1.5_: As a developer, I want to display the current score in the UI and persist it until reset so that players can see their progress throughout the game.
 - Display high score of the current session in‑game.
-  - _Sub requirement: As_ a developer, I want to display the high score of the current session in-game.
+  - _Sub requirement 1.6_: As a developer, I want to display the high score of the current session in-game.
 - Finalize scoring system unit test coverage.
-  - _Sub requirement 1.6_: As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
+  - _Sub requirement 1.7_: As a developer, I want to write unit tests for the scoring logic (base, multipliers, edge cases) so that I can verify correctness and prevent regressions.
 
 ### Week 4 (11/10 - 11/16)
 

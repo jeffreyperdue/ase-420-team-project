@@ -9,6 +9,8 @@
 
 ## Requirements
 
+- **Total**: 14
+
 ### Scoring System Requirements
 
 1. As a player, I want the game to award points for cleared lines so that I can track progress and compete for a higher score.

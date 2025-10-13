@@ -32,8 +32,6 @@ COLORS = (
     GREEN,
     RED,
     PINK,
-    WHITE,
-    GRAY,
 )
 
 # Cell (block) size in pixels

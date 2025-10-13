@@ -91,6 +91,22 @@ class Board:
 
         return result
 
+    def get_cell_color(self, row: int, col: int):
+        """
+            Return the color of the cell at (row, col).
+            Returns None if the cell is empty.
+        """
+        self._check_column_index(col)   # Validate column index
+
+        row_obj = self.get_row_object(row)  # Retrieve the Row object at the specified row index
+        if row_obj is None:  # Ensure the Row object exists
+            raise ValueError(f"Missing row data at index {row}")
+        
+        if not row_obj.get_bit(col):  # If cell is empty
+            return None
+            
+        return row_obj.get_color(col)  # Return the color of the cell
+
     def set_cell(self, row: int, col: int, color: object) -> None:
         """Set the cell at (row, col) to occupied and assign its color."""
         self._check_column_index(col)   # Validate column index
@@ -205,32 +221,53 @@ class Board:
             self.set_cell(row, col, piece.color)
         return True
     
+    def freeze_piece(self, piece) -> bool:
+        """
+        Permanently place a piece on the board (for when it stops moving).
+        Unlike place_piece, this doesn't track the piece cells for later removal.
+
+        Returns:
+            bool: True if placement was successful, False if collision was detected
+        """
+        # Check if piece will collide
+        if self.will_piece_collide(piece):
+            return False
+        
+        # Get the shape and place it permanently
+        shape = SHAPES[piece.type][piece.rotation]
+        for grid_position in shape:
+            coords = self.grid_position_to_coords(grid_position, piece.x, piece.y)
+            col = coords[0]
+            row = coords[1]
+            
+            self.set_cell(row, col, piece.color)
+        
+        return True
+    
     def go_space(self, piece) -> None:
         """
-        Drops the piece straight down until it collides, then freezes it.
+        Drops the piece straight down until it collides.
 
         Args:
             piece: The piece to be moved.
         """
         while not self.will_piece_collide(piece):
             piece.y += 1
-        piece.y -= 1
-        self.place_piece(piece)
+        piece.y -= 1  # Revert the last move that caused collision
 
     def go_down(self, piece) -> bool:
         """
-        Moves the piece one row down. If it collides, revert it and place it.
+        Moves the piece one row down. If it collides, revert it.
         
         Returns:
-            bool: True if moved successfully, False if it hit and was placed.
+            bool: True if moved successfully, False if it hit something and cannot move.
         """
+        original_y = piece.y
         piece.y += 1
         if self.will_piece_collide(piece):
-            piece.y -= 1
-            self.place_piece(piece)
-            return False
-        self.place_piece(piece)
-        return True
+            piece.y = original_y  # Revert to original position
+            return False  # Cannot move down
+        return True  # Successfully moved down
 
     def go_side(self, x_movement, piece) -> None:
         """
@@ -240,10 +277,10 @@ class Board:
             x_movement (int): Movement in X direction (-1 for left, 1 for right).
             piece: The piece to be moved.
         """
+        original_x = piece.x
         piece.x += x_movement
         if self.will_piece_collide(piece):
-            piece.x -= x_movement
-        self.place_piece(piece)
+            piece.x = original_x  # Revert to original position if it collides
 
     def rotate(self, piece) -> None:
         """
@@ -252,8 +289,7 @@ class Board:
         Args:
             piece: The piece to be rotated.
         """
-        old_rotation = piece.rotation
+        original_rotation = piece.rotation
         piece.rotation = (piece.rotation + 1) % len(SHAPES[piece.type])
         if self.will_piece_collide(piece):
-            piece.rotation = old_rotation
-        self.place_piece(piece)
+            piece.rotation = original_rotation  # Revert to original rotation if it collides

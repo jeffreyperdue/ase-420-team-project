@@ -12,7 +12,7 @@ def spawn_piece():
     from src.constants import START_X, START_Y
     return Piece(START_X, START_Y)
 
-def main():
+async def main():
     pygame.init()
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Tetris (Team Project)")
@@ -55,8 +55,12 @@ def main():
         # Update screen
         pygame.display.flip()
         clock.tick(FPS)
+        
+        # Yield control for web compatibility
+        await pygame.time.wait(0)
     
     pygame.quit()
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+    asyncio.run(main())

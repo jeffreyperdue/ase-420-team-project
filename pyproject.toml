@@ -1,0 +1,8 @@
+[build-system]
+requires = ["pygbag"]
+
+[tool.pygbag]
+title = "ASE 420 Tetris - Error 404 Name Not Found"
+description = "Team project Tetris game built with Python and Pygame"
+author = "Error 404 Name Not Found Team"
+version = "1.0.0"

@@ -9,6 +9,8 @@ To run a specific test:
   python -m unittest tests.test_board_edge_cases.TestBoard.test_invalid_dimensions_raise
 """
 
+from src.game.piece import Piece
+
 import os
 import sys
 import unittest
@@ -120,8 +122,10 @@ class TestBoardEdgeCases(unittest.TestCase):
         self.assertFalse(self.board.get_cell(row, col))
 
   def test_stub_method_behavior(self):
-    with self.assertRaises(NotImplementedError):
-      self.board.check_collision([], 0, 0)
+    # Test that the Board class has the expected collision detection method
+    piece = Piece(0, 0)
+    collision_result = self.board.will_piece_collide(piece)
+    self.assertIsInstance(collision_result, bool)
 
 
 if __name__ == '__main__':

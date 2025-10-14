@@ -3,7 +3,7 @@
 **Team:** Error 404 Name Not Found  
 **Project:** Tetris Game  
 **Sprint 1:** September 8 – October 13, 2025  
-**Sprint 2:** October 20 – November 23, 2024  
+**Sprint 2:** October 20 – November 23, 2025  
 
 ---
 
@@ -18,10 +18,9 @@
 
 ### 👥 Individual Member Contributions
 
-- **Anna Dinius:** LoC 2,442, Features 2, Requirements 2
+- **Anna Dinius:** LoC 1,434, Features 2, Requirements 2
 - **Cody King:** LoC 832, Features 3, Requirements 3  
 - **Owen Newberry:** LoC 176, Features 3, Requirements 3
-- **Jeffrey Perdue (Lead):** LoC 26, Features 0, Requirements 0
 
 ### 🎯 Sprint 1 Goals Achieved
 

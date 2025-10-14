@@ -24,8 +24,13 @@ async def main():
     renderer = PygameRenderer(screen)
     input_handler = InputHandler()
     
+    # Debug: Print initial piece info
+    print(f"Game started! Screen size: {SCREEN_SIZE}")
+    print(f"Current piece: x={game.current_piece.x}, y={game.current_piece.y}, type={game.current_piece.type}, color={game.current_piece.color}")
+    
     # Main application loop
     done = False
+    frame_count = 0
     while not done:
         events = pygame.event.get()
         
@@ -35,6 +40,7 @@ async def main():
                 done = True
         
         if game.done:
+            print("Game over!")
             done = True
         
         # Process input
@@ -47,6 +53,11 @@ async def main():
         
         # Update game state
         game.update()
+        
+        # Debug: Print piece position every 60 frames
+        frame_count += 1
+        if frame_count % 60 == 0:
+            print(f"Frame {frame_count}: Piece at ({game.current_piece.x}, {game.current_piece.y})")
         
         # Render
         renderer.draw_board(game.board)

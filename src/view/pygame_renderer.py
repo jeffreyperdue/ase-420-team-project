@@ -1,5 +1,5 @@
 import pygame
-from src.constants import COLORS, CELL_SIZE, WHITE, GRAY
+from src.constants import COLORS, CELL_SIZE, WHITE, GRAY, BLACK, RED
 from src.figures import SHAPES
 
 class PygameRenderer:
@@ -48,3 +48,23 @@ class PygameRenderer:
                 CELL_SIZE - 2
             ]
             pygame.draw.rect(self.screen, color, rect)
+
+    def draw_game_over_screen(self):
+        """Draw the game over screen"""
+        # Create a semi-transparent overlay
+        overlay = pygame.Surface(self.screen.get_size())
+        overlay.set_alpha(128)  # Semi-transparent
+        overlay.fill(BLACK)
+        self.screen.blit(overlay, (0, 0))
+        
+        # Game over text
+        font = pygame.font.Font(None, 48)
+        game_over_text = font.render("GAME OVER", True, RED)
+        text_rect = game_over_text.get_rect(center=(self.screen.get_width()//2, self.screen.get_height()//2 - 50))
+        self.screen.blit(game_over_text, text_rect)
+        
+        # Instructions text
+        font_small = pygame.font.Font(None, 24)
+        instructions_text = font_small.render("Press R to Restart or ESC to Quit", True, WHITE)
+        instructions_rect = instructions_text.get_rect(center=(self.screen.get_width()//2, self.screen.get_height()//2 + 20))
+        self.screen.blit(instructions_text, instructions_rect)

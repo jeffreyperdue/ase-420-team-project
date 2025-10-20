@@ -11,7 +11,8 @@ class InputHandler:
             pygame.K_DOWN: "DOWN",
             pygame.K_SPACE: "DROP",
             pygame.K_RETURN: "START",
-            pygame.K_ESCAPE: "QUIT"
+            pygame.K_ESCAPE: "QUIT",
+            pygame.K_r: "RESTART"  # Add restart key
         }
 
     def get_intents(self, events):

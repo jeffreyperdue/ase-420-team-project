@@ -34,23 +34,44 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
         
-        if game.done:
-            done = True
-        
-        # Process input
-        intents = input_handler.get_intents(events)
-        if intents:
-            print("Intents:", intents)
-            if "QUIT" in intents:
+        # Handle game over state
+        if game.game_over:
+            # Check for restart or quit input
+            intents = input_handler.get_intents(events)
+            if intents:
+                if "RESTART" in intents:
+                    # Reset game state
+                    board = Board(lambda: Row(WIDTH))
+                    game = Game(board, spawn_piece)
+                    renderer = PygameRenderer(screen)
+                elif "QUIT" in intents:
+                    done = True
+        else:
+            # Normal game input processing
+            if game.done:
                 done = True
-            game.apply(intents)  # Apply game rules
-        
-        # Update game state
-        game.update()
+            
+            # Process input
+            intents = input_handler.get_intents(events)
+            if intents:
+                print("Intents:", intents)
+                if "QUIT" in intents:
+                    done = True
+                game.apply(intents)  # Apply game rules
+            
+            # Update game state
+            game.update()
         
         # Render
-        renderer.draw_board(game.board)
-        renderer.draw_piece(game.current_piece)
+        if game.game_over:
+            # Draw the board in the background (frozen state)
+            renderer.draw_board(game.board)
+            # Draw game over overlay
+            renderer.draw_game_over_screen()
+        else:
+            # Normal rendering
+            renderer.draw_board(game.board)
+            renderer.draw_piece(game.current_piece)
         
         # Update screen
         pygame.display.flip()

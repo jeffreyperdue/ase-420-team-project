@@ -4,11 +4,16 @@ class Game:
         self.spawn_piece = spawn_piece_func
         self.current_piece = self.spawn_piece()
         self.done = False
+        self.game_over = False  # Add game over state
         self.gravity_timer = 0
         self.gravity_delay = 30 # frames between auto-fall
 
     def apply(self, intents):
         """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN)"""
+        # Don't process input if game is over
+        if self.game_over:
+            return
+            
         for intent in intents:
             if intent == "LEFT":
                 self._try_move(-1, 0)
@@ -23,6 +28,9 @@ class Game:
 
     def _try_move(self, dx, dy):
         """Try a move/rotate → if collision, cancel it"""
+        if self.game_over:
+            return
+            
         if dx != 0:
             self.board.go_side(dx, self.current_piece)
         elif dy != 0:
@@ -33,6 +41,9 @@ class Game:
 
     def _try_rotate(self):
         """Try rotation → if collision, cancel it"""
+        if self.game_over:
+            return
+            
         self.board.rotate(self.current_piece)
 
     def _freeze_piece(self):
@@ -44,6 +55,9 @@ class Game:
 
     def _drop_piece(self):
         """Drop piece instantly"""
+        if self.game_over:
+            return
+            
         self.board.go_space(self.current_piece)
         print("drop piece")
         self._freeze_piece()
@@ -52,10 +66,14 @@ class Game:
         """Spawn a new piece and check for game over (private)"""
         self.current_piece = self.spawn_piece()
         if self.board.will_piece_collide(self.current_piece):
+            self.game_over = True
             self.done = True
 
     def update(self):
         """Update game state (gravity)"""
+        if self.game_over:
+            return
+            
         self.gravity_timer += 1
         if self.gravity_timer >= self.gravity_delay:
             if not self.board.go_down(self.current_piece):

@@ -26,6 +26,7 @@ class Board:
         self.__width = width    # Board width (total number of columns)
         self._row_factory = row_factory     # Factory function to create Row objects
         self.clear()    # Populate the board with empty Row objects
+        self.__lines_cleared = 0  # Track total lines cleared
 
     @property
     def height(self):
@@ -38,6 +39,10 @@ class Board:
     @property
     def rows(self) -> LinkedList:
         return self._rows
+    
+    @property
+    def lines_cleared(self) -> int:
+        return self.__lines_cleared
     
     def validate_integrity(self) -> None:
         """Ensure the linked list length matches the board height."""
@@ -108,6 +113,8 @@ class Board:
         at the top to maintain height.
         """
         index = 0
+        self.__lines_cleared = 0  # Reset lines_cleared counter
+
         # Iterate over the current number of rows in the linked list. Using
         # self.height here is incorrect because deletions reduce the list
         # length; iterating up to self.rows.length() keeps the loop within
@@ -116,6 +123,7 @@ class Board:
             row_obj = self.get_row_object(index)
             if row_obj.is_full():
                 self.rows.delete_node(index)
+                self.__lines_cleared += 1
                 # Don't increment index — the next row shifts into this position
             else:
                 index += 1

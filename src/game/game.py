@@ -1,3 +1,6 @@
+from src.game.score import points_for_clear
+
+
 class Game:
     def __init__(self, board, spawn_piece_func):
         self.board = board
@@ -7,6 +10,11 @@ class Game:
         self.game_over = False  # Add game over state
         self.gravity_timer = 0
         self.gravity_delay = 30 # frames between auto-fall
+        self._score = 0
+
+    @property
+    def score(self):
+        return self._score
 
     def apply(self, intents):
         """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN)"""
@@ -51,6 +59,7 @@ class Game:
         # Piece is already placed by board.go_down() when it returns False
         self.board.clear_full_lines()  # clear rows
         print("freeze piece")
+        self._update_score(self.board.lines_cleared)  # update score
         self._spawn_new_piece()  # spawn new piece (private)
 
     def _drop_piece(self):
@@ -80,3 +89,11 @@ class Game:
                 print("freeze piece in update")
                 self._freeze_piece()
             self.gravity_timer = 0
+
+    def _update_score(self, lines_cleared):
+        """Update score based on number of lines cleared.
+
+        Delegates scoring logic to the pure helper points_for_clear so the
+        scoring table is defined in one place and is easy to unit-test.
+        """
+        self._score += points_for_clear(lines_cleared)

@@ -86,14 +86,20 @@
     - `tests\test_scoring.py`: 71
   - **Total**: 3,426
 - **🔥 Burn down rates**
-  - 3/3 Week 6 goals/milestones completed
+  - 3/3 _week 6 milestones/requirements_ completed
     - 100% total
     - ~14% per day
-  - 2/3 Week 7 goals/milestones completed early
-  - 5/14 Sprint 2 goals/milestones completed
+  - 2/3 _week 7 milestones/requirements_ completed early
+  - 0/3 sprint 2 _epic requirements_ completed
+    - 0% total
+  - 5/14 sprint 2 _sub requirements_ completed
     - ~36% total
     - ~36% per week
     - ~5.1% per day
+  - 5/17 sprint 2 _total requirements_ completed
+    - ~29% total
+    - ~29% per week
+    - ~4% per day
 
 ---
 

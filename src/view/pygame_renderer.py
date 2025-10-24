@@ -66,9 +66,6 @@ class PygameRenderer:
     def draw_next_piece(self, piece):
         color = COLORS[piece.color]
         shape = SHAPES[piece.type][piece.rotation]
-    
-        print(piece.x)
-        print(piece.y)
 
         for grid_position in shape:
             # Uses same logic as draw_piece function except places piece 

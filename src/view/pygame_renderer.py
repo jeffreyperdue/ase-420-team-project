@@ -40,9 +40,11 @@ class PygameRenderer:
         #TODO: Need to change this font color to black, maybe bold as well if possible?
         text_surface = font.render('Next Piece', True, GRAY)
 
+        #TODO: Need to look into if there is a better way to center this text within box
         self.screen.blit(text_surface, (315, 200))
 
-        pass
+        # Drawing piece into box holding the next piece
+        self.draw_next_piece(next_piece)
 
     def draw_piece(self, piece):
         color = COLORS[piece.color]
@@ -59,4 +61,26 @@ class PygameRenderer:
                 CELL_SIZE - 2,
                 CELL_SIZE - 2
             ]
+
+            pygame.draw.rect(self.screen, color, rect)
+
+    def draw_next_piece(self, piece):
+        color = COLORS[piece.color]
+        shape = SHAPES[piece.type][piece.rotation]
+    
+        print(piece.x)
+        print(piece.y)
+
+        for grid_position in shape:
+            # Uses same logic as draw_piece function except places piece off of board and inside of next page preview
+            col = 13 + (grid_position % 4)
+            row = 9 + (grid_position // 4)
+        
+            rect = [
+                self.board_x + CELL_SIZE * col,
+                self.board_y + CELL_SIZE * row,
+                CELL_SIZE - 1,
+                CELL_SIZE - 1
+            ]
+
             pygame.draw.rect(self.screen, color, rect)

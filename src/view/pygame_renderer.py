@@ -1,5 +1,5 @@
 import pygame
-from src.constants import COLORS, CELL_SIZE, WHITE, GRAY
+from src.constants import COLORS, CELL_SIZE, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
 from src.figures import SHAPES
 
 class PygameRenderer:
@@ -34,13 +34,12 @@ class PygameRenderer:
                         )
 
     def draw_next_piece_preview(self, next_piece):
-        #TODO: May change this color to black
-        pygame.draw.rect(self.screen, GRAY, [290, 200, 150, 150], 1)
+        
+        pygame.draw.rect(self.screen, BLACK, NEXT_PAGE_PREVIEW_RECT, 1)
         font = pygame.font.SysFont('Arial', 20)
-        #TODO: Need to change this font color to black, maybe bold as well if possible?
-        text_surface = font.render('Next Piece', True, GRAY)
 
-        #TODO: Need to look into if there is a better way to center this text within box
+        text_surface = font.render('Next Piece', True, BLACK)
+
         self.screen.blit(text_surface, (315, 200))
 
         # Drawing piece into box holding the next piece
@@ -72,7 +71,8 @@ class PygameRenderer:
         print(piece.y)
 
         for grid_position in shape:
-            # Uses same logic as draw_piece function except places piece off of board and inside of next page preview
+            # Uses same logic as draw_piece function except places piece 
+            # off of board and inside of next page preview
             col = 13 + (grid_position % 4)
             row = 9 + (grid_position // 4)
         

@@ -38,3 +38,6 @@ COLORS = (
 
 # Cell (block) size in pixels
 CELL_SIZE = 20
+
+# Rectangle to be drawn that stores the next page preview
+NEXT_PAGE_PREVIEW_RECT = [290, 200, 150, 150]

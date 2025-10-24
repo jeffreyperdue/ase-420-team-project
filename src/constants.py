@@ -1,5 +1,5 @@
 # Screen size
-SCREEN_SIZE = (400, 500)
+SCREEN_SIZE = (450, 500)
 FPS = 60
 
 # Playing grid/board dimensions

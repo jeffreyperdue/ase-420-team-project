@@ -14,6 +14,7 @@ def spawn_piece():
 
 def main():
     pygame.init()
+    pygame.font.init()
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Tetris (Team Project)")
     clock = pygame.time.Clock()

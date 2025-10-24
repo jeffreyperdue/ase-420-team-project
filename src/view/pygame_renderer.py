@@ -48,3 +48,6 @@ class PygameRenderer:
                 CELL_SIZE - 2
             ]
             pygame.draw.rect(self.screen, color, rect)
+
+    def draw_next_piece_preview(self, next_piece):
+        pass

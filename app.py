@@ -51,6 +51,7 @@ def main():
         # Render
         renderer.draw_board(game.board)
         renderer.draw_piece(game.current_piece)
+        renderer.draw_next_piece_preview(game.next_piece)
         
         # Update screen
         pygame.display.flip()

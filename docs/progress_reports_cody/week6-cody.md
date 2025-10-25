@@ -10,54 +10,54 @@
 
 - **LoC**
   - Source code:
-    - `src/starter_code/tetris_ver1.py`: 213
-    - `src/game/board.py`: 293
-    - `src/game/row.py`: 95
-  - **Total**: 642
+    - `app.py`: 2
+    - `src/game/game.py`: 2
+    - `src/view/pygame_renderer.py`: 33
+    - `src/constants.py`: 3
+    - `tests/test_next_piece_preview.py`: 102
+  - **Total**: 142
 - **Burn down rates**
-  - Sprint 1: 
-    - 100% total
-    - Based on total number of Sprint 1 goals/milestones completed (13/13)
+  - Sprint 2: 
+    - 27% total
+    - Based on total number of Sprint 2 goals/milestones completed (3/11)
 
 ---
 
 ## Summary of changes under src/
 
 - Files changed:
-  - `src/starter_code/tetris_ver1.py`
-  - `src/game/board.py`
-  - `src/game/row.py`
+  - `app.py`
+  - `src/game/game.py`
+  - `src/view/pygame_renderer.py`
+  - `src/constants.py`
+  - `tests/test_next_piece_preview.py`
 
 ---
 
 ## Major Changes
 
-### 1. `tetris_ver1.py`
+### 1. `app.py` & `game.py`
 
 - Changes
-    - **Fixed mixed logic approaches**: Removed conflicting global variable functions and converted to pure class-based approach
-    - **Resolved race conditions**: Fixed timing issues where pieces could move multiple times per frame when using manual controls
-    - **Improved piece placement logic**: Separated temporary piece positioning from permanent freezing to prevent incorrect placement
-    - **Enhanced timing control**: Added frame-based movement protection and proper timer resets for consistent new piece spawning
-    - **Code cleanup and organization**: Improved structure, naming conventions, documentation, and removed unused variables
-    - **Fixed game over detection**: Properly handles collision detection for new pieces at the top of the board
+    - **Implemented next piece preview feature**: Changed app and game files to use and render the next piece preview feature
 
-### 2. `board.py`
+### 2. `pygame_renderer.py`
 
 - Changes
-    - **Added `freeze_piece()` method**: Dedicated method for permanent piece placement without tracking for removal
-    - **Fixed movement methods**: Updated `go_down()`, `go_side()`, and `rotate()` to only modify piece position without permanent placement
-    - **Improved collision detection**: Enhanced position state management with proper original position storage and restoration
-    - **Added `get_cell_color()` method**: Enables proper color retrieval for drawing placed pieces
+    - **Added `draw_next_piece_preview()` method**: Added a method to draw the box to display the next piece preview and the text that says "Next Piece"
+    - **Added `draw_next_piece()` method**: Added method to draw the next piece inside of the next piece preview box on the right of the screen. Uses very similar logic to the draw_piece method except places the piece inside of the next piece preview box.
 
-### 3. `row.py`
+### 3. `constants.py`
 
 - Changes
-    - **Added `clear_bit()` method**: Missing method that was being called by Board class for clearing individual cells
-    - **Enhanced bit manipulation**: Proper bit clearing with color data removal
+    - **Added `NEXT_PIECE_PREVIEW_RECT` method**: Added the rectangle to be drawn to store the next piece shape
 
-### Other Notes
-- Game now runs smoothly with proper piece movement, rotation, and placement
-- All major timing and collision issues have been resolved
-- Manual controls (arrow keys, space, down key) work correctly without race conditions
-- Game properly handles piece freezing, line clearing, and game over conditions
+### 4. `test_next_piece_preview.py`
+
+- Changes
+    - **Added unit tests for next piece preview feature**: Added unit tests to test next piece preview functionality
+
+**Other Notes**: 
+- Next Piece Preview Feature working
+- All tests for next piece preview passing
+- Minor visual bug can happen sometimes when certain shapes are rendered in next piece preview box where the pieces can appear slightly off centered, will see about fixing this next week

@@ -102,20 +102,21 @@ class Board:
         node = self._rows.get_node_at(row)
         node.value.clear_bit(col)
 
-    def clear_full_lines(self) -> None:
+    def clear_full_lines(self) -> int:  # Changed: added -> int
         """
         Remove all full rows from the board and insert empty rows
         at the top to maintain height.
+        
+        Returns:
+            int: Number of lines cleared  # ADD THIS
         """
+        lines_cleared = 0  # ADD THIS LINE
         index = 0
-        # Iterate over the current number of rows in the linked list. Using
-        # self.height here is incorrect because deletions reduce the list
-        # length; iterating up to self.rows.length() keeps the loop within
-        # the present bounds.
         while index < self.rows.length():
             row_obj = self.get_row_object(index)
             if row_obj.is_full():
                 self.rows.delete_node(index)
+                lines_cleared += 1  # ADD THIS LINE
                 # Don't increment index — the next row shifts into this position
             else:
                 index += 1
@@ -124,6 +125,8 @@ class Board:
         missing_rows = self.height - self.rows.length()
         for _ in range(missing_rows):
             self.rows.insert_top(self._row_factory())
+        
+        return lines_cleared  # ADD THIS LINE at the end
 
     # Cody's game mechanics methods - PRESERVED FROM CODY'S BRANCH
     def grid_position_to_coords(self, position, x, y) -> tuple:

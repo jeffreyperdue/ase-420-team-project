@@ -68,3 +68,25 @@ class PygameRenderer:
         instructions_text = font_small.render("Press R to Restart or ESC to Quit", True, WHITE)
         instructions_rect = instructions_text.get_rect(center=(self.screen.get_width()//2, self.screen.get_height()//2 + 20))
         self.screen.blit(instructions_text, instructions_rect)
+
+    def draw_level_info(self, level, lines_cleared, gravity_delay):
+        """Draw level, lines cleared, and gravity info for debugging.
+        
+        Args:
+            level (int): Current level
+            lines_cleared (int): Total lines cleared
+            gravity_delay (int): Current gravity delay in frames
+        """
+        font = pygame.font.Font(None, 24)
+        
+        # Level display
+        level_text = font.render(f"Level: {level}", True, BLACK)
+        self.screen.blit(level_text, (10, 10))
+        
+        # Lines cleared display
+        lines_text = font.render(f"Lines: {lines_cleared}", True, BLACK)
+        self.screen.blit(lines_text, (10, 35))
+        
+        # Gravity delay display (for debugging)
+        gravity_text = font.render(f"Gravity: {gravity_delay} frames", True, BLACK)
+        self.screen.blit(gravity_text, (10, 60))

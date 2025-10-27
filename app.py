@@ -72,6 +72,7 @@ def main():
             # Normal rendering
             renderer.draw_board(game.board)
             renderer.draw_piece(game.current_piece)
+            renderer.draw_level_info(game.level, game.lines_cleared, game.gravity_delay)
         
         # Update screen
         pygame.display.flip()

@@ -6,6 +6,7 @@ class Game:
         self.board = board
         self.spawn_piece = spawn_piece_func
         self.current_piece = self.spawn_piece()
+        self.next_piece = self.spawn_piece()
         self.done = False
         self.game_over = False  # Add game over state
         self.gravity_timer = 0
@@ -72,8 +73,9 @@ class Game:
         self._freeze_piece()
 
     def _spawn_new_piece(self):
-        """Spawn a new piece and check for game over (private)"""
-        self.current_piece = self.spawn_piece()
+        """Replaces current piece with next piece and spawns a new next piece then checks for game over (private)"""
+        self.current_piece = self.next_piece
+        self.next_piece = self.spawn_piece()
         if self.board.will_piece_collide(self.current_piece):
             self.game_over = True
             self.done = True

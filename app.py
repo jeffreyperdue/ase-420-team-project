@@ -14,6 +14,7 @@ def spawn_piece():
 
 def main():
     pygame.init()
+    pygame.font.init()
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Tetris (Team Project)")
     clock = pygame.time.Clock()
@@ -74,6 +75,7 @@ def main():
             renderer.draw_board(game.board)
             renderer.draw_piece(game.current_piece)
             renderer.draw_score(game.score, game.high_score, (screen.get_width() - 150, 20)) # Display score and high score
+            renderer.draw_next_piece_preview(game.next_piece)
         
         # Update screen
         pygame.display.flip()

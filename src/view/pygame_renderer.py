@@ -49,11 +49,12 @@ class PygameRenderer:
             ]
             pygame.draw.rect(self.screen, color, rect)
 
-    def draw_score(self, score, position=(20, 20), font_size=32, color=BLACK):
-        """Render the current score on screen.
+    def draw_score(self, score, high_score, position=(20, 20), font_size=32, color=BLACK):
+        """Render the current score and high score on screen.
 
         Args:
             score (int): The current score to display.
+            high_score (int): The high score to display.
             position (tuple): (x, y) coordinates for the score text.
             font_size (int): Size of the font.
             color (tuple): RGB color of the text.
@@ -61,6 +62,11 @@ class PygameRenderer:
         font = pygame.font.Font(None, font_size)
         score_text = font.render(f"Score: {score}", True, color)
         self.screen.blit(score_text, position)
+        
+        # Draw high score below current score
+        high_score_pos = (position[0], position[1] + font_size + 5)
+        high_score_text = font.render(f"High Score: {high_score}", True, color)
+        self.screen.blit(high_score_text, high_score_pos)
 
     def draw_game_over_screen(self):
         """Draw the game over screen"""

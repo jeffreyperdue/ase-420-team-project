@@ -68,12 +68,12 @@ def main():
             renderer.draw_board(game.board)
             # Draw game over overlay
             renderer.draw_game_over_screen()
-            renderer.draw_score(game.score, (screen.get_width() - 150, 20)) # Display score
+            renderer.draw_score(game.score, game.high_score, (screen.get_width() - 150, 20)) # Display score and high score
         else:
             # Normal rendering
             renderer.draw_board(game.board)
             renderer.draw_piece(game.current_piece)
-            renderer.draw_score(game.score, (screen.get_width() - 150, 20)) # Display score
+            renderer.draw_score(game.score, game.high_score, (screen.get_width() - 150, 20)) # Display score and high score
         
         # Update screen
         pygame.display.flip()

@@ -1,4 +1,4 @@
-from src.game.score import points_for_clear
+from src.utils.score import points_for_clear
 
 
 class Game:
@@ -11,10 +11,15 @@ class Game:
         self.gravity_timer = 0
         self.gravity_delay = 30 # frames between auto-fall
         self._score = 0
+        self._high_score = 0  # Track high score for current session
 
     @property
     def score(self):
         return self._score
+        
+    @property
+    def high_score(self):
+        return self._high_score
 
     def apply(self, intents):
         """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN)"""
@@ -95,5 +100,11 @@ class Game:
 
         Delegates scoring logic to the pure helper points_for_clear so the
         scoring table is defined in one place and is easy to unit-test.
+        
+        No points are awarded after game_over is set to True.
         """
-        self._score += points_for_clear(lines_cleared)
+        if not self.game_over:
+            self._score += points_for_clear(lines_cleared)
+            # Update high score if current score exceeds it
+            if self._score > self._high_score:
+                self._high_score = self._score

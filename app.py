@@ -6,6 +6,7 @@ from src.game.piece import Piece
 from src.game.row import Row
 from src.view.pygame_renderer import PygameRenderer
 from src.view.input import InputHandler
+from src.utils.session_manager import SessionManager
 
 def spawn_piece():
     """Simple function to spawn a new piece"""
@@ -20,8 +21,9 @@ def main():
     clock = pygame.time.Clock()
     
     # Create components
+    session = SessionManager()
     board = Board(lambda: Row(WIDTH))
-    game = Game(board, spawn_piece)  # Just the game referee
+    game = Game(board, spawn_piece, session)  # Just the game referee
     renderer = PygameRenderer(screen)
     input_handler = InputHandler()
     
@@ -43,7 +45,7 @@ def main():
                 if "RESTART" in intents:
                     # Reset game state
                     board = Board(lambda: Row(WIDTH))
-                    game = Game(board, spawn_piece)
+                    game = Game(board, spawn_piece, session)
                     renderer = PygameRenderer(screen)
                 elif "QUIT" in intents:
                     done = True
@@ -69,12 +71,12 @@ def main():
             renderer.draw_board(game.board)
             # Draw game over overlay
             renderer.draw_game_over_screen()
-            renderer.draw_score(game.score, game.high_score, (screen.get_width() - 150, 20)) # Display score and high score
+            renderer.draw_score(game.score, game.high_score) # Position will be calculated relative to board
         else:
             # Normal rendering
             renderer.draw_board(game.board)
             renderer.draw_piece(game.current_piece)
-            renderer.draw_score(game.score, game.high_score, (screen.get_width() - 150, 20)) # Display score and high score
+            renderer.draw_score(game.score, game.high_score) # Position will be calculated relative to board
             renderer.draw_next_piece_preview(game.next_piece)
         
         # Update screen

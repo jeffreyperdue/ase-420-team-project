@@ -1,5 +1,5 @@
 import pygame
-from src.constants import COLORS, CELL_SIZE, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
+from src.constants import COLORS, CELL_SIZE, RED, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
 from src.figures import SHAPES
 
 class PygameRenderer:
@@ -63,23 +63,30 @@ class PygameRenderer:
 
             pygame.draw.rect(self.screen, color, rect)
 
-    def draw_score(self, score, high_score, position=(20, 20), font_size=32, color=BLACK):
+    def draw_score(self, score, high_score, font_size=24, color=BLACK):
         """Render the current score and high score on screen.
+        Positions scores relative to the game board.
 
         Args:
             score (int): The current score to display.
             high_score (int): The high score to display.
-            position (tuple): (x, y) coordinates for the score text.
             font_size (int): Size of the font.
             color (tuple): RGB color of the text.
         """
-        font = pygame.font.Font(None, font_size)
-        score_text = font.render(f"Score: {score}", True, color)
-        self.screen.blit(score_text, position)
+        font = pygame.font.SysFont('Arial', font_size, bold=True)
         
-        # Draw high score below current score
-        high_score_pos = (position[0], position[1] + font_size + 5)
+        # Position scores to the right of the board
+        # Calculate position based on board_x and CELL_SIZE
+        score_x = self.board_x + 12 * CELL_SIZE  # Position after the board width (10) plus some padding
+        score_y = self.board_y  # Align with top of board
+        
+        # Draw current score
+        score_text = font.render(f"Score: {score}", True, color)
+        self.screen.blit(score_text, (score_x, score_y))
+        
+        # Draw high score below current score with spacing
         high_score_text = font.render(f"High Score: {high_score}", True, color)
+        high_score_pos = (score_x, score_y + font_size + 5)
         self.screen.blit(high_score_text, high_score_pos)
 
     def draw_game_over_screen(self):

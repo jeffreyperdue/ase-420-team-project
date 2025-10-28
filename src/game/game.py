@@ -1,8 +1,7 @@
 from src.utils.score import points_for_clear
 
-
 class Game:
-    def __init__(self, board, spawn_piece_func):
+    def __init__(self, board, spawn_piece_func, session):
         self.board = board
         self.spawn_piece = spawn_piece_func
         self.current_piece = self.spawn_piece()
@@ -12,7 +11,7 @@ class Game:
         self.gravity_timer = 0
         self.gravity_delay = 30 # frames between auto-fall
         self._score = 0
-        self._high_score = 0  # Track high score for current session
+        self._session = session  # Session manager dependency injection
 
     @property
     def score(self):
@@ -20,7 +19,7 @@ class Game:
         
     @property
     def high_score(self):
-        return self._high_score
+        return self._session.high_score
 
     def apply(self, intents):
         """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN)"""
@@ -107,6 +106,5 @@ class Game:
         """
         if not self.game_over:
             self._score += points_for_clear(lines_cleared)
-            # Update high score if current score exceeds it
-            if self._score > self._high_score:
-                self._high_score = self._score
+            # Update session high score if current score is higher
+            self._session.update_high_score(self._score)

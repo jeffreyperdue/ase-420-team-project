@@ -7,7 +7,7 @@ repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
 
-from src.game.score import points_for_clear
+from utils.score import points_for_clear
 from src.game.game import Game
 from src.game.board import Board
 from src.game.row import Row

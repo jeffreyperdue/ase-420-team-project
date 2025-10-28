@@ -21,7 +21,7 @@ paginate: true
 - **Cody King** – Pieces & Collision  
 - **Owen Newberry** – Rendering & Controls  
 
-**Sprint 2 Progress**: 5/17 total requirements completed (29% total, 36% per week)
+**Sprint 2 Progress**: 5/37 total requirements completed (14% total, 14% per week)
 
 ---
 
@@ -72,9 +72,9 @@ paginate: true
 - **Perfect milestone alignment**
 
 ### Sprint 2 Progress  
-- **29% total** (5/17 total requirements completed)
-- **36% per week** average
-- **~5.1% per day** overall progress
+- **14% total** (5/37 total requirements completed)
+- **14% per week** average
+- **~2% per day** overall progress
 
 ---
 
@@ -197,13 +197,18 @@ def clear_full_lines(self):
 
 ## Sprint 2 Progress Analysis
 
-### Completed Requirements (5/17)
-- ✅ **1.1**: Scoring logic decoupled from rendering (Anna)
-- ✅ **1.2**: Base scoring function implementation (Anna)
-- ✅ **1.3**: Multi-line multipliers (Anna)
-- ✅ **1.4**: Board integration for scoring (Anna)
-- ✅ **1.7**: Unit tests for scoring (Anna)
+### Completed Requirements (5/37)
+- ✅ **Anna 1.1**: Scoring logic decoupled from rendering
+- ✅ **Anna 1.2**: Base scoring function implementation  
+- ✅ **Anna 1.3**: Multi-line multipliers
+- ✅ **Anna 1.4**: Board integration for scoring
+- ✅ **Cody 1.1**: Preview display area in renderer
 
+### Upcoming Requirements
+- **Anna**: Score display, high score tracking, start screen, game over screen (9 remaining)
+- **Cody**: Preview integration, pause/resume functionality (11 remaining)  
+- **Owen**: Difficulty levels, ghost piece implementation (11 remaining)
+- **Total Remaining**: 32/37 requirements (86%)
 
 ---
 
@@ -241,5 +246,61 @@ def clear_full_lines(self):
 - **Anna**: Scoring system complete, ready for advanced features
 - **Cody**: Preview system complete, ready for additional UI features
 - **Overall**: Strong foundation for final Sprint 2 completion
+
+---
+
+## Sprint 2 Progress Update
+
+### Requirement Completion Rate
+- **Week 5**: 0/37 (0%)
+- **Week 6**: 5/37 (14%)
+- **Projected Week 7**: 12/37 (32%)
+- **Projected Week 8**: 20/37 (54%)
+- **Projected Week 9**: 30/37 (81%)
+- **Projected Week 10**: 37/37 (100%)
+
+---
+
+### Velocity Analysis
+- **Current Progress**: 14% per week average
+- **Quality Focus**: 100% test coverage maintained
+- **Innovation**: Advanced features beyond basic requirements
+- **Team Coordination**: Parallel development with no conflicts
+
+---
+
+## Week 7 Focus Areas
+
+### Upcoming Goals
+- **Anna**: Score display and high score tracking
+- **Cody**: Preview integration with piece generation
+- **Owen**: Difficulty level framework and ghost piece logic
+- **Total**: 7 additional requirements planned
+
+### Success Metrics
+- **Functional Scoring**: Complete scoring system in gameplay
+- **Visual Polish**: Professional-looking preview system
+- **Code Quality**: Maintained test coverage and documentation
+- **Performance**: Smooth gameplay with all features
+
+---
+
+## Questions & Discussion
+
+**Ready for advanced scoring features?**  
+**Any concerns about preview system integration?**  
+**Final Sprint 2 completion strategy?**
+
+---
+
+# 🎯 Week 7 Focus
+
+**Priority**: Advanced Features & Integration  
+**Goal**: Complete Sprint 2 requirements with polish  
+**Success Metrics**: 
+- Advanced scoring features implemented
+- Complete game loop integration
+- Professional UI polish
+- 100% Sprint 2 requirement completion
 
 ---

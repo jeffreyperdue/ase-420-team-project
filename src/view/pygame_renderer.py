@@ -67,15 +67,38 @@ class PygameRenderer:
         color = COLORS[piece.color]
         shape = SHAPES[piece.type][piece.rotation]
 
-        for grid_position in shape:
-            # Uses same logic as draw_piece function except places piece 
-            # off of board and inside of next page preview
-            col = 13 + (grid_position % 4)
-            row = 9 + (grid_position // 4)
+        # Calculate bounding box of the shape to center it properly
+        cols = [grid_position % 4 for grid_position in shape]
+        rows = [grid_position // 4 for grid_position in shape]
         
+        min_col = min(cols)
+        max_col = max(cols)
+        min_row = min(rows)
+        max_row = max(rows)
+        
+        # Calculate width and height of the piece
+        piece_width = max_col - min_col + 1
+        piece_height = max_row - min_row + 1
+        
+        # Calculate offset to center the piece in the preview box
+        # Preview box is NEXT_PAGE_PREVIEW_RECT = [290, 200, 150, 150]
+        # We want to center it in a ~4x4 cell area
+        preview_center_x = 290 + 150 // 2  # center x of preview box
+        preview_center_y = 200 + 150 // 2  # center y of preview box
+        
+        # Calculate the offset needed to center this specific piece
+        offset_x = (4 - piece_width) / 2 - min_col
+        offset_y = (4 - piece_height) / 2 - min_row
+
+        for grid_position in shape:
+            # Convert 4x4 grid position to preview box coordinates
+            col = (grid_position % 4) + offset_x
+            row = (grid_position // 4) + offset_y
+            
+            # Calculate position relative to the preview box center
             rect = [
-                self.board_x + CELL_SIZE * col,
-                self.board_y + CELL_SIZE * row,
+                preview_center_x - (2 * CELL_SIZE) + (col * CELL_SIZE),
+                preview_center_y - (2 * CELL_SIZE) + (row * CELL_SIZE),
                 CELL_SIZE - 1,
                 CELL_SIZE - 1
             ]

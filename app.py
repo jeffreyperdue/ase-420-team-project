@@ -42,8 +42,6 @@ def main():
         intents = input_handler.get_intents(events)
         if intents:
             print("Intents:", intents)
-            if "QUIT" in intents:
-                done = True
             game.apply(intents)  # Apply game rules
         
         # Update game state
@@ -53,6 +51,10 @@ def main():
         renderer.draw_board(game.board)
         renderer.draw_piece(game.current_piece)
         renderer.draw_next_piece_preview(game.next_piece)
+        
+        # Draw pause screen overlay if paused
+        if game.paused:
+            renderer.draw_pause_screen()
         
         # Update screen
         pygame.display.flip()

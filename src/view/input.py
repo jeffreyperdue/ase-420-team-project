@@ -11,7 +11,7 @@ class InputHandler:
             pygame.K_DOWN: "DOWN",
             pygame.K_SPACE: "DROP",
             pygame.K_RETURN: "START",
-            pygame.K_ESCAPE: "QUIT"
+            pygame.K_ESCAPE: "PAUSE"
         }
 
     def get_intents(self, events):
@@ -20,4 +20,6 @@ class InputHandler:
             if event.type == pygame.KEYDOWN:
                 if event.key in self.key_map:
                     intents.append(self.key_map[event.key])
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                intents.append("CLICK")
         return intents

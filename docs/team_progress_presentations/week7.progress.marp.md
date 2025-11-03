@@ -89,6 +89,7 @@ paginate: true
   - Week 7 goals: 3/3 (100%)  
   - Sprint 2 milestone completion (per Cody report): 6/12 (~50%)
 
+---
 - **Owen**  
   - Week 7 goals: 3/3 (100%)  
   - Sprint 2 milestone completion: 7/14 (50%)

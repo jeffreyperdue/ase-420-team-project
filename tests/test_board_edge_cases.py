@@ -9,8 +9,6 @@ To run a specific test:
   python -m unittest tests.test_board_edge_cases.TestBoard.test_invalid_dimensions_raise
 """
 
-from src.game.piece import Piece
-
 import os
 import sys
 import unittest

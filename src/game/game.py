@@ -8,6 +8,7 @@ class Game:
         self.next_piece = self.spawn_piece()
         self.done = False
         self.game_over = False  # Add game over state
+        self.paused = False
         self.gravity_timer = 0
         self.gravity_delay = 30 # frames between auto-fall
         self._score = 0
@@ -22,22 +23,27 @@ class Game:
         return self._session.high_score
 
     def apply(self, intents):
-        """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN)"""
+        """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN/PAUSE/CLICK)"""
         # Don't process input if game is over
         if self.game_over:
             return
             
         for intent in intents:
-            if intent == "LEFT":
-                self._try_move(-1, 0)
-            elif intent == "RIGHT":
-                self._try_move(1, 0)
-            elif intent == "DOWN" or intent == "SOFT_DOWN":
-                self._try_move(0, 1)
-            elif intent == "ROTATE":
-                self._try_rotate()
-            elif intent == "DROP":
-                self._drop_piece()
+            if intent == "PAUSE":
+                self.paused = not self.paused
+            elif intent == "CLICK" and self.paused:
+                self.paused = False
+            elif not self.paused:
+                if intent == "LEFT":
+                    self._try_move(-1, 0)
+                elif intent == "RIGHT":
+                    self._try_move(1, 0)
+                elif intent == "DOWN" or intent == "SOFT_DOWN":
+                    self._try_move(0, 1)
+                elif intent == "ROTATE":
+                    self._try_rotate()
+                elif intent == "DROP":
+                    self._drop_piece()
 
     def _try_move(self, dx, dy):
         """Try a move/rotate → if collision, cancel it"""
@@ -89,12 +95,13 @@ class Game:
         if self.game_over:
             return
             
-        self.gravity_timer += 1
-        if self.gravity_timer >= self.gravity_delay:
-            if not self.board.go_down(self.current_piece):
-                print("freeze piece in update")
-                self._freeze_piece()
-            self.gravity_timer = 0
+        if not self.paused:
+            self.gravity_timer += 1
+            if self.gravity_timer >= self.gravity_delay:
+                if not self.board.go_down(self.current_piece):
+                    print("freeze piece in update")
+                    self._freeze_piece()
+                self.gravity_timer = 0
 
     def _update_score(self, lines_cleared):
         """Update score based on number of lines cleared.

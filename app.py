@@ -79,6 +79,10 @@ def main():
             renderer.draw_score(game.score, game.high_score) # Position will be calculated relative to board
             renderer.draw_next_piece_preview(game.next_piece)
         
+        # Draw pause screen overlay if paused
+        if game.paused:
+            renderer.draw_pause_screen()
+        
         # Update screen
         pygame.display.flip()
         clock.tick(FPS)

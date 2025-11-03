@@ -161,3 +161,98 @@ class PygameRenderer:
         resume_text = font_small.render('Press ESC or Click to Resume', True, WHITE)
         resume_rect = resume_text.get_rect(center=(center_x, center_y + 20))
         self.screen.blit(resume_text, resume_rect)
+    def draw_level_info(self, level, lines_cleared, gravity_delay):
+        """Draw level, lines cleared, and gravity info for debugging.
+        
+        Args:
+            level (int): Current level
+            lines_cleared (int): Total lines cleared
+            gravity_delay (int): Current gravity delay in frames
+        """
+        font = pygame.font.Font(None, 24)
+        
+        # Level display
+        level_text = font.render(f"Level: {level}", True, BLACK)
+        self.screen.blit(level_text, (10, 10))
+        
+        # Lines cleared display
+        lines_text = font.render(f"Lines: {lines_cleared}", True, BLACK)
+        self.screen.blit(lines_text, (10, 35))
+        
+        # Gravity delay display (for debugging)
+        gravity_text = font.render(f"Gravity: {gravity_delay} frames", True, BLACK)
+        self.screen.blit(gravity_text, (10, 60))
+
+    def draw_next_piece(self, piece):
+        color = COLORS[piece.color]
+        shape = SHAPES[piece.type][piece.rotation]
+
+        cols = [grid_position % 4 for grid_position in shape]
+        rows = [grid_position // 4 for grid_position in shape]
+        
+        min_col, max_col = min(cols), max(cols)
+        min_row, max_row = min(rows), max(rows)
+        
+        piece_width = max_col - min_col + 1
+        piece_height = max_row - min_row + 1
+        
+        preview_center_x = NEXT_PAGE_PREVIEW_RECT[0] + NEXT_PAGE_PREVIEW_RECT[2] // 2
+        preview_center_y = NEXT_PAGE_PREVIEW_RECT[1] + NEXT_PAGE_PREVIEW_RECT[3] // 2
+        
+        offset_x = (4 - piece_width) / 2 - min_col
+        offset_y = (4 - piece_height) / 2 - min_row
+
+        for grid_position in shape:
+            col = (grid_position % 4) + offset_x
+            row = (grid_position // 4) + offset_y
+            
+            rect = [
+                preview_center_x - (2 * CELL_SIZE) + (col * CELL_SIZE),
+                preview_center_y - (2 * CELL_SIZE) + (row * CELL_SIZE),
+                CELL_SIZE - 1,
+                CELL_SIZE - 1
+            ]
+
+            pygame.draw.rect(self.screen, color, rect)
+
+    def draw_pause_screen(self):
+        """Draw the pause screen overlay"""
+        overlay = pygame.Surface(SCREEN_SIZE)
+        overlay.set_alpha(180)
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
+        
+        font_large = pygame.font.SysFont('Arial', 48, bold=True)
+        font_small = pygame.font.SysFont('Arial', 24)
+        
+        center_x = SCREEN_SIZE[0] // 2
+        center_y = SCREEN_SIZE[1] // 2
+        
+        paused_text = font_large.render('PAUSED', True, WHITE)
+        paused_rect = paused_text.get_rect(center=(center_x, center_y - 40))
+        self.screen.blit(paused_text, paused_rect)
+        
+        resume_text = font_small.render('Press ESC or Click to Resume', True, WHITE)
+        resume_rect = resume_text.get_rect(center=(center_x, center_y + 20))
+        self.screen.blit(resume_text, resume_rect)
+    def draw_level_info(self, level, lines_cleared, gravity_delay):
+        """Draw level, lines cleared, and gravity info for debugging.
+        
+        Args:
+            level (int): Current level
+            lines_cleared (int): Total lines cleared
+            gravity_delay (int): Current gravity delay in frames
+        """
+        font = pygame.font.Font(None, 24)
+        
+        # Level display
+        level_text = font.render(f"Level: {level}", True, BLACK)
+        self.screen.blit(level_text, (10, 10))
+        
+        # Lines cleared display
+        lines_text = font.render(f"Lines: {lines_cleared}", True, BLACK)
+        self.screen.blit(lines_text, (10, 35))
+        
+        # Gravity delay display (for debugging)
+        gravity_text = font.render(f"Gravity: {gravity_delay} frames", True, BLACK)
+        self.screen.blit(gravity_text, (10, 60))

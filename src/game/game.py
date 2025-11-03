@@ -10,9 +10,15 @@ class Game:
         self.game_over = False  # Add game over state
         self.paused = False
         self.gravity_timer = 0
-        self.gravity_delay = 30 # frames between auto-fall
+        # Scoring/session (HEAD)
         self._score = 0
         self._session = session  # Session manager dependency injection
+        
+        # Progression (Owen)
+        self.level = 1
+        self.lines_cleared = 0
+        self.base_gravity_delay = 30
+        self.gravity_delay = self.base_gravity_delay  # frames between auto-fall
 
     @property
     def score(self):
@@ -68,9 +74,12 @@ class Game:
     def _freeze_piece(self):
         """Freeze step: lock piece, clear rows, spawn new piece"""
         # Piece is already placed by board.go_down() when it returns False
-        self.board.clear_full_lines()  # clear rows
+        lines_cleared = self.board.clear_full_lines()  # clear rows, returns count
         print("freeze piece")
-        self._update_score(self.board.lines_cleared)  # update score
+        # Update score and level if lines cleared
+        if lines_cleared > 0:
+            self._update_score(lines_cleared)
+            self._update_level(lines_cleared)
         self._spawn_new_piece()  # spawn new piece (private)
 
     def _drop_piece(self):
@@ -115,3 +124,27 @@ class Game:
             self._score += points_for_clear(lines_cleared)
             # Update session high score if current score is higher
             self._session.update_high_score(self._score)
+
+    def _calculate_gravity_delay(self) -> int:
+        """Calculate gravity delay based on current level.
+        As level increases, pieces fall faster.
+        
+        Returns:
+            int: Frames between auto-fall
+        """
+        speed_increase = 3
+        calculated_delay = max(1, self.base_gravity_delay - (self.level - 1) * speed_increase)
+        return calculated_delay
+
+    def _update_level(self, lines_cleared_count: int) -> None:
+        """Update level based on lines cleared.
+        
+        Args:
+            lines_cleared_count (int): Number of lines cleared in this action
+        """
+        if lines_cleared_count > 0:
+            self.lines_cleared += lines_cleared_count
+            new_level = (self.lines_cleared // 10) + 1
+            if new_level > self.level:
+                self.level = new_level
+                self.gravity_delay = self._calculate_gravity_delay()

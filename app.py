@@ -71,6 +71,9 @@ def main():
         else:
             # Normal rendering
             renderer.draw_board(game.board)
+            # Draw ghost piece first (behind the actual piece)
+            if not game.game_over:
+                renderer.draw_ghost_piece(game.board, game.current_piece)
             renderer.draw_piece(game.current_piece)
             renderer.draw_level_info(game.level, game.lines_cleared, game.gravity_delay)
         

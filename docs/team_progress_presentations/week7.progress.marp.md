@@ -33,10 +33,19 @@ paginate: true
 - ✅ Display session high score in‑game
 
 ---
+
 ### Cody's Goals ✅
 - ✅ Integrate Next Piece preview with piece generation  
 - ✅ Add pause state management to the game loop  
 - ✅ Modify input handling for pause/resume (ESC, click-to-resume)
+
+---
+
+### Owen's Goals ✅
+- ✅ Integrate level progression with line clearing
+- ✅ Calculate landing position for ghost piece
+- ✅ Implement ghost piece collision detection logic
+- ✅ Write unit tests for ghost piece calculation
 
 ---
 

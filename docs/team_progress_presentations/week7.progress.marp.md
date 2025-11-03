@@ -59,7 +59,13 @@ paginate: true
   - `src/view/input.py`: 8  
   - `src/view/pygame_renderer.py`: 46
 
-**Total**: 227 lines of code
+ ---
+- **Owen**: 77 LoC total
+  - `app.py`: 3  
+  - `src/game/board.py`: 46  
+  - `src/view/pygame_renderer.py`: 28
+
+**Total**: 304 lines of code
 
 ---
 
@@ -73,6 +79,10 @@ paginate: true
 - **Cody**  
   - Week 7 goals: 3/3 (100%)  
   - Sprint 2 milestone completion (per Cody report): 6/12 (~50%)
+
+- **Owen**  
+  - Week 7 goals: 3/3 (100%)  
+  - Sprint 2 milestone completion: 7/14 (50%)
 
 ---
 
@@ -90,6 +100,13 @@ paginate: true
 - `ESC` maps to `PAUSE`; click emits `CLICK` to resume  
 - `draw_pause_screen()` overlay in renderer  
 - Next Piece preview centered via 4x4 bounding box of piece
+
+---
+
+### Level Progression Integration & Ghost Piece System (Owen)
+- Level progression wired to line clearing
+- Ghost piece landing calculation
+- Ghost piece visualization
 
 ---
 
@@ -165,7 +182,8 @@ def draw_next_piece(self, piece) -> None:
 ## Week 7 vs Sprint 2 Planning
 
 - **Anna – Ahead of plan**: Completed Week 7 and part of Week 8 work  
-- **Cody – On plan**: Completed Week 7 goals including Pause/Resume and preview integration  
+- **Cody – On plan**: Completed Week 7 goals including Pause/Resume and preview integration
+- **Owen - On plan**: Completed Week 7 goals with Ghost Piece and Level Progression functionalities
 - **Team**: Strong momentum toward full Sprint 2 completion
 
 ---

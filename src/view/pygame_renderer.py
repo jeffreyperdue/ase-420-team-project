@@ -1,12 +1,27 @@
 import pygame
 from src.constants import COLORS, CELL_SIZE, RED, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
 from src.figures import SHAPES
+from src.ui.button_manager import ButtonManager
+from src.ui.start_screen_layout_utils import center_popup, content_area
+from src.ui.start_screen_render_utils import draw_overlay, draw_popup_background, draw_wrapped_label
 
 class PygameRenderer:
     def __init__(self, screen, board_origin=(70, 60), next_piece_preview_origin=(110, 60)):
         self.screen = screen
         self.board_x, self.board_y = board_origin
         self.next_piece_preview_x, self.next_piece_preview_y = next_piece_preview_origin
+        self.arrow_keys_img = pygame.image.load("src/view/img/arrow-keys.png").convert_alpha()
+        self.arrow_keys_img = self._scale_by_height(self.arrow_keys_img, 80)
+        self.spacebar_key_img = pygame.image.load("src/view/img/spacebar-key.png").convert()
+        self.spacebar_key_img = self._scale_by_height(self.spacebar_key_img, 30)
+        self.button_manager = ButtonManager()
+
+    def _scale_by_height(self, image, target_height):
+        original_width, original_height = image.get_size()
+        scale_factor = target_height / original_height
+        scaled_width = int(original_width * scale_factor)
+        scaled_image = pygame.transform.smoothscale(image, (scaled_width, target_height))
+        return scaled_image
 
     def draw_board(self, board):
         self.screen.fill(WHITE)
@@ -89,6 +104,100 @@ class PygameRenderer:
         high_score_pos = (score_x, score_y + font_size + 5)
         self.screen.blit(high_score_text, high_score_pos)
 
+    def draw_start_screen(self):
+        """Draw the start screen."""
+        draw_overlay(self.screen, BLACK)
+        
+        # Create start screen popup
+        popup_width = 400
+        popup_height = 520
+        popup_x, popup_y = center_popup(self.screen.get_width(), self.screen.get_height(), popup_width, popup_height)
+        
+        padding = 30
+        content_x, content_y, content_width, content_height = content_area(popup_x, popup_y, popup_width, popup_height, padding)
+
+        draw_popup_background(self.screen, WHITE, popup_x, popup_y, popup_width, popup_height)
+        
+        # Title
+        title_font = pygame.font.Font(None, 60)
+        title_text = title_font.render("Tetris", True, BLACK)
+        title_rect = title_text.get_rect(centerx=popup_x + popup_width // 2, y=content_y)
+        self.screen.blit(title_text, title_rect)
+
+        spacing_below_title = 100
+        
+        # Controls section
+        controls_font = pygame.font.SysFont('Arial', 16, bold=False)
+        
+        # Draw arrow keys image
+        arrow_img_x = content_x + (content_width - self.arrow_keys_img.get_width()) // 2
+        arrow_img_y = content_y + spacing_below_title
+        self.screen.blit(self.arrow_keys_img, (arrow_img_x, arrow_img_y))
+
+        # Get arrow image dimensions and center
+        arrow_width = self.arrow_keys_img.get_width()
+        arrow_height = self.arrow_keys_img.get_height()
+        arrow_center_x = arrow_img_x + arrow_width // 2
+        arrow_center_y = arrow_img_y + arrow_height // 2
+
+        # ROTATE (label)
+        rotate_label = controls_font.render("Rotate", True, BLACK)
+        rotate_rect = rotate_label.get_rect(center=(arrow_center_x, arrow_img_y - 18))
+        self.screen.blit(rotate_label, rotate_rect)
+
+        # MOVE LEFT (label)
+        draw_wrapped_label(self.screen, controls_font, arrow_img_x - 25, arrow_center_y + 20, "Move", "Left", BLACK)
+
+        # MOVE RIGHT (label)
+        draw_wrapped_label(self.screen, controls_font, arrow_img_x + arrow_width + 25, arrow_center_y + 20, "Move", "Right", BLACK)
+
+        # SOFT DROP (label)
+        drop_bottom = draw_wrapped_label(self.screen, controls_font, arrow_center_x, arrow_img_y + arrow_height + 25, "Soft", "Drop", BLACK)
+        
+        # Draw spacebar image directly below
+        spacebar_img_x = content_x + (content_width - self.spacebar_key_img.get_width()) // 2
+        spacebar_img_y = drop_bottom + 30
+        self.screen.blit(self.spacebar_key_img, (spacebar_img_x, spacebar_img_y))
+
+        # Draw spacebar label (below spacebar)
+        spacebar_width = self.spacebar_key_img.get_width()
+        space_label = controls_font.render("Space Bar: Hard Drop", True, BLACK)
+        space_rect = space_label.get_rect(center=(spacebar_img_x + spacebar_width // 2, spacebar_img_y + self.spacebar_key_img.get_height() + 20))
+        self.screen.blit(space_label, space_rect)
+
+        spacing_above_buttons = 30
+
+        # Buttons
+        button_width = 200
+        button_height = 40
+        button_x = content_x + (content_width - button_width) // 2
+        
+        start_y = space_rect.bottom + spacing_above_buttons
+        exit_y = start_y + button_height + 10
+
+        # Add buttons to manager (only once)
+        if not self.button_manager.buttons:
+            self.button_manager.add_button(
+                rect=(button_x, start_y, button_width, button_height),
+                label="Start Game",
+                action="START",
+                color=(0, 200, 0),
+                text_color=WHITE
+            )
+            self.button_manager.add_button(
+                rect=(button_x, exit_y, button_width, button_height),
+                label="Exit",
+                action="EXIT",
+                color=(200, 0, 0),
+                text_color=WHITE
+            )
+
+        # Draw buttons
+        buttons_font = pygame.font.SysFont('Arial', 18, bold=True)
+
+        self.button_manager.draw(self.screen, buttons_font)
+        self.button_manager.set_cursor()
+
     def draw_game_over_screen(self):
         """Draw the game over screen"""
         # Create a semi-transparent overlay
@@ -108,6 +217,8 @@ class PygameRenderer:
         instructions_text = font_small.render("Press R to Restart or ESC to Quit", True, WHITE)
         instructions_rect = instructions_text.get_rect(center=(self.screen.get_width()//2, self.screen.get_height()//2 + 20))
         self.screen.blit(instructions_text, instructions_rect)
+
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
     def draw_next_piece(self, piece):
         color = COLORS[piece.color]

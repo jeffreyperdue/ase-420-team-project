@@ -1,17 +1,28 @@
 from src.utils.score import points_for_clear
+from src.constants.game_states import START_SCREEN, PLAYING, GAME_OVER
 
 class Game:
     def __init__(self, board, spawn_piece_func, session):
         self.board = board
         self.spawn_piece = spawn_piece_func
-        self.current_piece = self.spawn_piece()
-        self.next_piece = self.spawn_piece()
+        self.current_piece = None
+        self.next_piece = None
         self.done = False
-        self.game_over = False  # Add game over state
         self.gravity_timer = 0
         self.gravity_delay = 30 # frames between auto-fall
         self._score = 0
         self._session = session  # Session manager dependency injection
+        self._state = START_SCREEN
+        
+    def start_new_game(self):
+        """Initialize a new game."""
+        self.board.clear()  # Clear the board before starting a new game
+        self.current_piece = self.spawn_piece()
+        self.next_piece = self.spawn_piece()
+        self.done = False
+        self._score = 0
+        self._state = PLAYING
+        self.gravity_timer = 0
 
     @property
     def score(self):
@@ -22,11 +33,25 @@ class Game:
         return self._session.high_score
 
     def apply(self, intents):
-        """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN)"""
-        # Don't process input if game is over
-        if self.game_over:
+        """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN/START/EXIT)"""
+        # Handle start screen and game over states
+        if self._state == START_SCREEN:
+            for intent in intents:
+                if intent == "START":
+                    self.start_new_game()
+                elif intent == "QUIT":
+                    self.done = True
             return
             
+        if self._state == GAME_OVER:
+            for intent in intents:
+                if intent == "QUIT":
+                    self.done = True
+                elif intent == "RESTART":
+                    self.start_new_game()
+            return
+            
+        # Game is in progress - handle gameplay inputs
         for intent in intents:
             if intent == "LEFT":
                 self._try_move(-1, 0)
@@ -41,7 +66,7 @@ class Game:
 
     def _try_move(self, dx, dy):
         """Try a move/rotate → if collision, cancel it"""
-        if self.game_over:
+        if self._state == GAME_OVER:
             return
             
         if dx != 0:
@@ -54,7 +79,7 @@ class Game:
 
     def _try_rotate(self):
         """Try rotation → if collision, cancel it"""
-        if self.game_over:
+        if self._state == GAME_OVER:
             return
             
         self.board.rotate(self.current_piece)
@@ -69,7 +94,7 @@ class Game:
 
     def _drop_piece(self):
         """Drop piece instantly"""
-        if self.game_over:
+        if self._state == GAME_OVER:
             return
             
         self.board.go_space(self.current_piece)
@@ -81,12 +106,11 @@ class Game:
         self.current_piece = self.next_piece
         self.next_piece = self.spawn_piece()
         if self.board.will_piece_collide(self.current_piece):
-            self.game_over = True
-            self.done = True
+            self._state = GAME_OVER
 
     def update(self):
         """Update game state (gravity)"""
-        if self.game_over:
+        if self._state == GAME_OVER:
             return
             
         self.gravity_timer += 1
@@ -102,9 +126,9 @@ class Game:
         Delegates scoring logic to the pure helper points_for_clear so the
         scoring table is defined in one place and is easy to unit-test.
         
-        No points are awarded after game_over is set to True.
+        No points are awarded after game state is set to GAME_OVER.
         """
-        if not self.game_over:
+        if not self._state == GAME_OVER:
             self._score += points_for_clear(lines_cleared)
             # Update session high score if current score is higher
             self._session.update_high_score(self._score)

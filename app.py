@@ -13,39 +13,6 @@ def spawn_piece():
     from src.constants import START_X, START_Y
     return Piece(START_X, START_Y)
 
-def handle_button_click(pos, game):
-    """Handle clicking of start screen buttons."""
-    # Get screen dimensions for button positions
-    screen_width = SCREEN_SIZE[0]
-    screen_height = SCREEN_SIZE[1]
-    
-    # Button dimensions from renderer
-    button_width = 200
-    button_height = 40
-    
-    # Calculate popup dimensions
-    popup_width = 400
-    popup_height = 500
-    popup_x = (screen_width - popup_width) // 2
-    popup_y = (screen_height - popup_height) // 2
-    
-    # Calculate button positions (must match renderer)
-    button_x = screen_width//2 - button_width//2
-    start_y = popup_y + popup_height - 120
-    exit_y = popup_y + popup_height - 60
-    
-    # Check start button
-    if (button_x <= pos[0] <= button_x + button_width and 
-        start_y <= pos[1] <= start_y + button_height):
-        return "START"
-        
-    # Check exit button
-    if (button_x <= pos[0] <= button_x + button_width and 
-        exit_y <= pos[1] <= exit_y + button_height):
-        return "EXIT"
-    
-    return None
-
 def main():
     pygame.init()
     pygame.font.init()

@@ -92,14 +92,14 @@
   - 2/3 _week 7 milestones/requirements_ completed early
   - 0/3 sprint 2 _epic requirements_ completed
     - 0% total
-  - 5/14 sprint 2 _sub requirements_ completed
-    - ~36% total
-    - ~36% per week
-    - ~5.1% per day
-  - 5/17 sprint 2 _total requirements_ completed
+  - 4/14 sprint 2 _sub requirements_ completed
     - ~29% total
     - ~29% per week
     - ~4% per day
+  - 4/17 sprint 2 _total requirements_ completed
+    - ~24% total
+    - ~24% per week
+    - ~3.4% per day
 
 ---
 

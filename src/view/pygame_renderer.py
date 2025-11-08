@@ -112,6 +112,6 @@ class PygameRenderer:
         paused_rect = paused_text.get_rect(center=(center_x, center_y - 40))
         self.screen.blit(paused_text, paused_rect)
         
-        resume_text = font_small.render('Press ESC or Click to Resume', True, WHITE)
+        resume_text = font_small.render('Press P, ESC, or Click to Resume', True, WHITE)
         resume_rect = resume_text.get_rect(center=(center_x, center_y + 20))
         self.screen.blit(resume_text, resume_rect)

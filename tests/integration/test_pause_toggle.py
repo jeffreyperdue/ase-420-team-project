@@ -26,45 +26,35 @@ class TestPauseToggle(unittest.TestCase):
         self.input_handler = InputHandler()
 
     def test_pause_with_p_key(self):
-        # Initially not paused
+        """Pressing 'p' toggles pause on and off."""
         self.assertFalse(self.game.paused)
-        
-        # Press 'p' to pause
         events = [MagicMock(type=pygame.KEYDOWN, key=pygame.K_p)]
         intents = self.input_handler.get_intents(events)
         self.game.apply(intents)
         self.assertTrue(self.game.paused)
-        
-        # Press 'p' again to unpause
         events = [MagicMock(type=pygame.KEYDOWN, key=pygame.K_p)]
         intents = self.input_handler.get_intents(events)
         self.game.apply(intents)
         self.assertFalse(self.game.paused)
 
     def test_escape_acts_as_quit_and_pause(self):
-        # ESC should produce QUIT and also toggle pause intent
+        """ESC emits QUIT + PAUSE and toggles paused state."""
         events = [MagicMock(type=pygame.KEYDOWN, key=pygame.K_ESCAPE)]
         intents = self.input_handler.get_intents(events)
         self.assertIn("QUIT", intents)
         self.assertIn("PAUSE", intents)
-        
-        # Apply to game toggles pause
         self.game.apply(intents)
         self.assertTrue(self.game.paused)
-        
-        # ESC again should unpause
         intents = self.input_handler.get_intents(events)
         self.game.apply(intents)
         self.assertFalse(self.game.paused)
 
     def test_click_unpauses(self):
-        # Pause first
+        """Mouse click resumes from paused state."""
         events = [MagicMock(type=pygame.KEYDOWN, key=pygame.K_p)]
         intents = self.input_handler.get_intents(events)
         self.game.apply(intents)
         self.assertTrue(self.game.paused)
-        
-        # Simulate mouse click
         click_events = [MagicMock(type=pygame.MOUSEBUTTONDOWN)]
         intents = self.input_handler.get_intents(click_events)
         self.game.apply(intents)

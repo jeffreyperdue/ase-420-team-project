@@ -43,6 +43,13 @@ paginate: true
 
 ---
 
+### Owen's Goals ✅
+- ✅ Adjust piece fall speed based on level
+- ✅ Render ghost piece with distinct visual style
+- ✅ Update ghost piece position in real-time
+
+---
+
 ## Statistics Overview
 
 ### Lines of Code Added
@@ -62,11 +69,18 @@ paginate: true
   - Tests: `tests/test_scoring.py`: 13, `tests/test_session_score.py`: 94 (new)
 
 ---
+
 - **Cody**: 10 LoC total
   - `src/view/input.py`: 2  
   - `tests/integration/test_pause_toggle.py`: 8
 
-**Total**: 394 lines of code
+---
+
+- **Owen**: 10 LoC total
+  - `src/game/game.py`: 2  
+  - `src/view/pygame_renderer.py`: 26
+
+**Total**: 422 lines of code
 
 ---
 
@@ -79,6 +93,10 @@ paginate: true
   - Total requirements completed: 10/17 (~59%)
 
 - **Cody**  
+  - Week 8 goals: 3/3 (100%)  
+  - Sprint 2 milestone completion: 9/12 (~75%)
+ 
+- **Owen**  
   - Week 8 goals: 3/3 (100%)  
   - Sprint 2 milestone completion: 9/12 (~75%)
 

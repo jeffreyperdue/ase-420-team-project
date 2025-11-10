@@ -9,7 +9,7 @@ class Game:
         self.level = 1
         self.lines_cleared = 0
         self.base_gravity_delay = 30
-        self.gravity_delay = self.base_gravity_delay
+        self.gravity_delay = self._calculate_gravity_delay()
 
     def apply(self, intents):
         """Apply player intents (LEFT/RIGHT/ROTATE/DROP/SOFT_DOWN)"""

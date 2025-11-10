@@ -108,11 +108,27 @@ class PygameRenderer:
                 CELL_SIZE - 2,
                 CELL_SIZE - 2
             ]
-            # Draw a semi-transparent outline for ghost piece
-            # First draw a light gray fill
+            # Draw ghost piece with distinct visual style:
+            # Semi-transparent fill with the piece's color (but very faded)
+            ghost_color = COLORS[piece.color]
+            # Create a very transparent version of the piece color
             ghost_surface = pygame.Surface((CELL_SIZE - 2, CELL_SIZE - 2))
-            ghost_surface.set_alpha(80)  # Semi-transparent
-            ghost_surface.fill(GRAY)
+            ghost_surface.set_alpha(50)  # Semi-transparent
+            ghost_surface.fill(ghost_color)
             self.screen.blit(ghost_surface, (rect[0], rect[1]))
             # Then draw outline
-            pygame.draw.rect(self.screen, GRAY, rect, 1)
+            # Draw dashed outline to make it more distinct
+            # Draw top and bottom edges
+            pygame.draw.line(self.screen, ghost_color, 
+                           (rect[0], rect[1]), 
+                           (rect[0] + rect[2], rect[1]), 2)
+            pygame.draw.line(self.screen, ghost_color, 
+                           (rect[0], rect[1] + rect[3]), 
+                           (rect[0] + rect[2], rect[1] + rect[3]), 2)
+            # Draw left and right edges
+            pygame.draw.line(self.screen, ghost_color, 
+                           (rect[0], rect[1]), 
+                           (rect[0], rect[1] + rect[3]), 2)
+            pygame.draw.line(self.screen, ghost_color, 
+                           (rect[0] + rect[2], rect[1]), 
+                           (rect[0] + rect[2], rect[1] + rect[3]), 2)

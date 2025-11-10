@@ -82,10 +82,17 @@ def main():
         elif game._state == GAME_OVER:
             renderer.draw_game_over_screen()
         
+        # Draw ghost piece if playing and not paused
+        if game._state == PLAYING and game.current_piece and not game.paused:
+            renderer.draw_ghost_piece(board, game.current_piece)
+        
+        # Draw level info if playing
+        if game._state == PLAYING:
+            renderer.draw_level_info(game.level, game.lines_cleared, game.gravity_delay)
+        
         # Draw pause screen overlay if paused
         if game.paused:
             renderer.draw_pause_screen()
-            renderer.draw_level_info(game.level, game.lines_cleared, game.gravity_delay)
         
         # Refresh display
         pygame.display.flip()

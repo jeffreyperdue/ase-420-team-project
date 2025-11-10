@@ -367,3 +367,29 @@ class PygameRenderer:
         # Gravity delay display (for debugging)
         gravity_text = font.render(f"Gravity: {gravity_delay} frames", True, BLACK)
         self.screen.blit(gravity_text, (10, 60))
+        
+    def draw_ghost_piece(self, board, piece):
+        """
+        Draw a 'ghost' outline of the piece at its landing position.
+        """
+        shape = SHAPES[piece.type][piece.rotation]
+        land_y = board.get_landing_y(piece)
+
+        for grid_position in shape:
+            col = piece.x + (grid_position % 4)
+            row = land_y + (grid_position // 4)
+
+            rect = [
+                self.board_x + CELL_SIZE * col,
+                self.board_y + CELL_SIZE * row,
+                CELL_SIZE - 2,
+                CELL_SIZE - 2
+            ]
+            # Draw a semi-transparent outline for ghost piece
+            # First draw a light gray fill
+            ghost_surface = pygame.Surface((CELL_SIZE - 2, CELL_SIZE - 2))
+            ghost_surface.set_alpha(80)  # Semi-transparent
+            ghost_surface.fill(GRAY)
+            self.screen.blit(ghost_surface, (rect[0], rect[1]))
+            # Then draw outline
+            pygame.draw.rect(self.screen, GRAY, rect, 1)

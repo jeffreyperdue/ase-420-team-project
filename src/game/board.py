@@ -269,3 +269,49 @@ class Board:
         if self.will_piece_collide(piece):
             piece.rotation = old_rotation
         
+    def get_landing_y(self, piece) -> int:
+        """
+        Calculate the landing Y coordinate for a piece without mutating it.
+        
+        Returns:
+            int: The Y position where the piece would rest if hard-dropped.
+        """
+        # Local simulate y, do not mutate the original piece
+        sim_y = piece.y
+        # Increment until the next step would collide
+        while True:
+            sim_y += 1
+            # Temporarily check collision at (piece.x, sim_y)
+            if self._would_collide_at(piece, piece.x, sim_y):
+                return sim_y - 1
+
+    def get_ghost_cells(self, piece):
+        """
+        Return the list of (col,row) cells for the ghost piece at its landing position.
+        """
+        land_y = self.get_landing_y(piece)
+        shape = SHAPES[piece.type][piece.rotation]
+        cells = []
+        for grid_position in shape:
+            col = piece.x + (grid_position % 4)
+            row = land_y + (grid_position // 4)
+            cells.append((col, row))
+        return cells
+
+    def _would_collide_at(self, piece, x, y) -> bool:
+        """
+        Like will_piece_collide but checks collision at an arbitrary (x, y)
+        without mutating the piece.
+        """
+        shape = SHAPES[piece.type][piece.rotation]
+        for grid_position in shape:
+            col = x + (grid_position % 4)
+            row = y + (grid_position // 4)
+
+            if row < 0 or row >= self.height or col < 0 or col >= self.width:
+                return True
+
+            if self.get_cell(row, col):
+                return True
+
+        return False

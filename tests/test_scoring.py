@@ -12,7 +12,8 @@ from src.game.game import Game
 from src.game.board import Board
 from src.game.piece import Piece
 from src.game.row import Row
-from utils.score import points_for_clear
+from src.utils.session_manager import SessionManager
+from src.utils.score import points_for_clear
 from src.view.pygame_renderer import PygameRenderer
 from src.constants import WIDTH, HEIGHT, WHITE
 
@@ -28,7 +29,8 @@ class TestScoring(unittest.TestCase):
     def setUp(self):
         """Create a clean board and game for each test."""
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
-        self.game = Game(self.board, simple_spawn)
+        self.session = SessionManager()  # Get singleton instance
+        self.game = Game(self.board, simple_spawn, self.session)
 
     def test_points_for_clear_basic(self):
         """Test the pure scoring function with valid inputs."""
@@ -93,7 +95,8 @@ class TestScoring(unittest.TestCase):
 
     def test_freeze_piece_updates_for_multiple_lines(self):
         board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
-        game = Game(board, simple_spawn)
+        session = SessionManager()
+        game = Game(board, simple_spawn, session)
 
         # Fill the bottom two rows completely
         bottom = board.height - 1
@@ -111,7 +114,8 @@ class TestScoring(unittest.TestCase):
 
     def test_score_accumulates_across_freezes(self):
         board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
-        game = Game(board, simple_spawn)
+        session = SessionManager()
+        game = Game(board, simple_spawn, session)
 
         # First clear 1 line
         bottom = board.height - 1
@@ -180,21 +184,23 @@ class TestScoring(unittest.TestCase):
         pygame.init()
         pygame.font.init()
         try:
-            surface = pygame.Surface((200, 80))
+            # Width needs to accommodate score position which is 12 cells from board origin
+            # 12 cells * 20px per cell = 240px minimum, add some margin
+            surface = pygame.Surface((300, 80))
             surface.fill(WHITE)
-            renderer = PygameRenderer(surface)
-            renderer.draw_score(12345, position=(10, 10), font_size=24, color=(0, 0, 0))
-
-            # Check a small region near the text for at least one non-background pixel
+            renderer = PygameRenderer(surface, board_origin=(0, 0))
+            renderer.draw_score(12345, high_score=1000, font_size=24, color=(0, 0, 0))
+            
+            # Check where we know the text should be - near x=240 (12 cells * 20px)
             changed = False
-            for x in range(10, 80):
-                for y in range(10, 40):
+            for x in range(220, 280):  # Check around score position
+                for y in range(0, 40):  # From top of board down
                     if surface.get_at((x, y)) != WHITE:
                         changed = True
                         break
                 if changed:
                     break
-
+                    
             self.assertTrue(changed, "Expected draw_score to modify the surface pixels")
         finally:
             pygame.quit()

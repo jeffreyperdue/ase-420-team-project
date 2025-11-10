@@ -1,5 +1,5 @@
 import pygame
-from src.constants import WIDTH, SCREEN_SIZE, FPS
+from src.constants import WIDTH, SCREEN_SIZE, FPS, START_SCREEN, PLAYING, GAME_OVER
 from src.game.game import Game
 from src.game.board import Board
 from src.game.piece import Piece
@@ -31,61 +31,66 @@ def main():
     done = False
     while not done:
         events = pygame.event.get()
+        intents = []
         
-        # Quit check
+        # Event processing
         for event in events:
             if event.type == pygame.QUIT:
                 done = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left click
+                    for button in renderer.button_manager.buttons:
+                        if button.is_hovered(event.pos):
+                            button.clicked = True
+                    intent = renderer.button_manager.handle_click(event.pos)
+                    if intent:
+                        intents.append(intent)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                for button in renderer.button_manager.buttons:
+                    button.clicked = False
         
-        # Handle game over state
-        if game.game_over:
-            # Check for restart or quit input
-            intents = input_handler.get_intents(events)
-            if intents:
-                if "RESTART" in intents:
-                    # Reset game state
-                    board = Board(lambda: Row(WIDTH))
-                    game = Game(board, spawn_piece, session)
-                    renderer = PygameRenderer(screen)
-                elif "QUIT" in intents:
-                    done = True
-        else:
-            # Normal game input processing
-            if game.done:
-                done = True
+        # Add keyboard intents
+        intents.extend(input_handler.get_intents(events))
             
-            # Process input
-            intents = input_handler.get_intents(events)
-            if intents:
-                print("Intents:", intents)
-                if "QUIT" in intents:
-                    done = True
-                game.apply(intents)  # Apply game rules
+        # Apply intents and update game
+        game.apply(intents)
+        
+        if "EXIT" in intents:
+            done = True
+
+        if game.done:
+            done = True
             
-            # Update game state
+        # Only update gravity when playing
+        if game._state == PLAYING:
             game.update()
+
+        # Draw current state
+        renderer.draw_board(board)  # Draw the board grid and filled cells
         
-        # Render
-        if game.game_over:
-            # Draw the board in the background (frozen state)
-            renderer.draw_board(game.board)
-            # Draw game over overlay
+        # Draw game elements if not in start screen
+        if game._state != START_SCREEN:
+            if game.current_piece:  # Draw the currently falling piece
+                renderer.draw_piece(game.current_piece)
+            if game.next_piece:  # Draw the next piece preview
+                renderer.draw_next_piece_preview(game.next_piece)
+            renderer.draw_score(game.score, game.high_score)
+
+        # Draw overlays based on game state
+        if game._state == START_SCREEN:
+            renderer.draw_start_screen()
+        elif game._state == GAME_OVER:
             renderer.draw_game_over_screen()
-            renderer.draw_score(game.score, game.high_score) # Position will be calculated relative to board
-        else:
-            # Normal rendering
-            renderer.draw_board(game.board)
-            renderer.draw_piece(game.current_piece)
-            renderer.draw_score(game.score, game.high_score) # Position will be calculated relative to board
-            renderer.draw_next_piece_preview(game.next_piece)
         
         # Draw pause screen overlay if paused
         if game.paused:
             renderer.draw_pause_screen()
             renderer.draw_level_info(game.level, game.lines_cleared, game.gravity_delay)
         
-        # Update screen
+        # Refresh display
         pygame.display.flip()
+        
+        # Cap frame rate
         clock.tick(FPS)
     
     pygame.quit()

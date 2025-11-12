@@ -2,8 +2,6 @@ import pygame
 from src.constants import COLORS, CELL_SIZE, RED, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
 from src.figures import SHAPES
 from src.ui.button_manager import ButtonManager
-from src.ui.pop_up_layout_utils import center_popup, content_area
-from src.ui.pop_up_render_utils import draw_overlay, draw_popup_background, draw_wrapped_label
 from src.ui.pop_up import Popup
 
 class PygameRenderer:
@@ -11,10 +9,8 @@ class PygameRenderer:
         self.screen = screen
         self.board_x, self.board_y = board_origin
         self.next_piece_preview_x, self.next_piece_preview_y = next_piece_preview_origin
-        self.arrow_keys_img = pygame.image.load("src/view/img/arrow-keys.png").convert_alpha()
-        self.arrow_keys_img = self._scale_by_height(self.arrow_keys_img, 80)
-        self.spacebar_key_img = pygame.image.load("src/view/img/spacebar-key.png").convert()
-        self.spacebar_key_img = self._scale_by_height(self.spacebar_key_img, 30)
+        self.controls_img = pygame.image.load("src/view/img/controls.png").convert_alpha()
+        self.controls_img = self._scale_by_height(self.controls_img, 240)
         self.button_manager = ButtonManager()
 
     def _scale_by_height(self, image, target_height):
@@ -110,13 +106,13 @@ class PygameRenderer:
         """Draw the start screen using the Popup helper."""
         # Build body lines describing controls (we'll use images plus text)
         # To allow flexible height, we construct a Popup with title, images and body lines.
-        body_lines = ["Use arrow keys to move and rotate.", "Space: Hard Drop"]
+        body_lines = [""]
 
         # Compose images with small captions handled in body_lines for simplicity
         popup = Popup(
             title="Tetris",
             body_lines=body_lines,
-            images=[self.arrow_keys_img, self.spacebar_key_img],
+            images=[self.controls_img],
             buttons=[("Start Game", "START", (0, 200, 0)), ("Exit", "EXIT", (200, 0, 0))],
             width=420,
             padding=24,

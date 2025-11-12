@@ -1,5 +1,5 @@
 import pygame
-from src.constants import COLORS, CELL_SIZE, RED, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
+from src.constants import COLORS, CELL_SIZE, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
 from src.figures import SHAPES
 from src.ui.button_manager import ButtonManager
 from src.ui.pop_up import Popup

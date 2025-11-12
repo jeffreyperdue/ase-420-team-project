@@ -2,8 +2,9 @@ import pygame
 from src.constants import COLORS, CELL_SIZE, RED, WHITE, GRAY, BLACK, NEXT_PAGE_PREVIEW_RECT
 from src.figures import SHAPES
 from src.ui.button_manager import ButtonManager
-from src.ui.start_screen_layout_utils import center_popup, content_area
-from src.ui.start_screen_render_utils import draw_overlay, draw_popup_background, draw_wrapped_label
+from src.ui.pop_up_layout_utils import center_popup, content_area
+from src.ui.pop_up_render_utils import draw_overlay, draw_popup_background, draw_wrapped_label
+from src.ui.pop_up import Popup
 
 class PygameRenderer:
     def __init__(self, screen, board_origin=(70, 60), next_piece_preview_origin=(110, 60)):
@@ -106,119 +107,41 @@ class PygameRenderer:
 
     def draw_start_screen(self):
         """Draw the start screen."""
-        draw_overlay(self.screen, BLACK)
-        
-        # Create start screen popup
-        popup_width = 400
-        popup_height = 520
-        popup_x, popup_y = center_popup(self.screen.get_width(), self.screen.get_height(), popup_width, popup_height)
-        
-        padding = 30
-        content_x, content_y, content_width, content_height = content_area(popup_x, popup_y, popup_width, popup_height, padding)
+        """Draw the start screen using the Popup helper."""
+        # Build body lines describing controls (we'll use images plus text)
+        # To allow flexible height, we construct a Popup with title, images and body lines.
+        body_lines = ["Use arrow keys to move and rotate.", "Space: Hard Drop"]
 
-        draw_popup_background(self.screen, WHITE, popup_x, popup_y, popup_width, popup_height)
-        
-        # Title
-        title_font = pygame.font.Font(None, 60)
-        title_text = title_font.render("Tetris", True, BLACK)
-        title_rect = title_text.get_rect(centerx=popup_x + popup_width // 2, y=content_y)
-        self.screen.blit(title_text, title_rect)
+        # Compose images with small captions handled in body_lines for simplicity
+        popup = Popup(
+            title="Tetris",
+            body_lines=body_lines,
+            images=[self.arrow_keys_img, self.spacebar_key_img],
+            buttons=[("Start Game", "START", (0, 200, 0)), ("Exit", "EXIT", (200, 0, 0))],
+            width=420,
+            padding=24,
+        )
 
-        spacing_below_title = 100
-        
-        # Controls section
-        controls_font = pygame.font.SysFont('Arial', 16, bold=False)
-        
-        # Draw arrow keys image
-        arrow_img_x = content_x + (content_width - self.arrow_keys_img.get_width()) // 2
-        arrow_img_y = content_y + spacing_below_title
-        self.screen.blit(self.arrow_keys_img, (arrow_img_x, arrow_img_y))
+        popup.render(self.screen, self.button_manager)
 
-        # Get arrow image dimensions and center
-        arrow_width = self.arrow_keys_img.get_width()
-        arrow_height = self.arrow_keys_img.get_height()
-        arrow_center_x = arrow_img_x + arrow_width // 2
-        arrow_center_y = arrow_img_y + arrow_height // 2
+    def draw_game_over_screen(self, score=None, high_score=None):
+        """Draw the game over popup using the Popup helper.
 
-        # ROTATE (label)
-        rotate_label = controls_font.render("Rotate", True, BLACK)
-        rotate_rect = rotate_label.get_rect(center=(arrow_center_x, arrow_img_y - 18))
-        self.screen.blit(rotate_label, rotate_rect)
+        The popup will display the final score and session high score and
+        provide two buttons: Play Again (RESTART) and Quit (QUIT).
+        """
+        # Compose body lines including the score info
+        body_lines = ["You can try again or quit.", f"Score: {score if score is not None else 0}", f"High Score: {high_score if high_score is not None else 0}"]
 
-        # MOVE LEFT (label)
-        draw_wrapped_label(self.screen, controls_font, arrow_img_x - 25, arrow_center_y + 20, "Move", "Left", BLACK)
+        popup = Popup(
+            title="GAME OVER",
+            body_lines=body_lines,
+            buttons=[("Play Again", "RESTART", (0, 200, 0)), ("Quit", "QUIT", (200, 0, 0))],
+            width=360,
+            padding=20,
+        )
 
-        # MOVE RIGHT (label)
-        draw_wrapped_label(self.screen, controls_font, arrow_img_x + arrow_width + 25, arrow_center_y + 20, "Move", "Right", BLACK)
-
-        # SOFT DROP (label)
-        drop_bottom = draw_wrapped_label(self.screen, controls_font, arrow_center_x, arrow_img_y + arrow_height + 25, "Soft", "Drop", BLACK)
-        
-        # Draw spacebar image directly below
-        spacebar_img_x = content_x + (content_width - self.spacebar_key_img.get_width()) // 2
-        spacebar_img_y = drop_bottom + 30
-        self.screen.blit(self.spacebar_key_img, (spacebar_img_x, spacebar_img_y))
-
-        # Draw spacebar label (below spacebar)
-        spacebar_width = self.spacebar_key_img.get_width()
-        space_label = controls_font.render("Space Bar: Hard Drop", True, BLACK)
-        space_rect = space_label.get_rect(center=(spacebar_img_x + spacebar_width // 2, spacebar_img_y + self.spacebar_key_img.get_height() + 20))
-        self.screen.blit(space_label, space_rect)
-
-        spacing_above_buttons = 30
-
-        # Buttons
-        button_width = 200
-        button_height = 40
-        button_x = content_x + (content_width - button_width) // 2
-        
-        start_y = space_rect.bottom + spacing_above_buttons
-        exit_y = start_y + button_height + 10
-
-        # Add buttons to manager (only once)
-        if not self.button_manager.buttons:
-            self.button_manager.add_button(
-                rect=(button_x, start_y, button_width, button_height),
-                label="Start Game",
-                action="START",
-                color=(0, 200, 0),
-                text_color=WHITE
-            )
-            self.button_manager.add_button(
-                rect=(button_x, exit_y, button_width, button_height),
-                label="Exit",
-                action="EXIT",
-                color=(200, 0, 0),
-                text_color=WHITE
-            )
-
-        # Draw buttons
-        buttons_font = pygame.font.SysFont('Arial', 18, bold=True)
-
-        self.button_manager.draw(self.screen, buttons_font)
-        self.button_manager.set_cursor()
-
-    def draw_game_over_screen(self):
-        """Draw the game over screen"""
-        # Create a semi-transparent overlay
-        overlay = pygame.Surface(self.screen.get_size())
-        overlay.set_alpha(128)  # Semi-transparent
-        overlay.fill(BLACK)
-        self.screen.blit(overlay, (0, 0))
-        
-        # Game over text
-        font = pygame.font.Font(None, 48)
-        game_over_text = font.render("GAME OVER", True, RED)
-        text_rect = game_over_text.get_rect(center=(self.screen.get_width()//2, self.screen.get_height()//2 - 50))
-        self.screen.blit(game_over_text, text_rect)
-        
-        # Instructions text
-        font_small = pygame.font.Font(None, 24)
-        instructions_text = font_small.render("Press R to Restart or ESC to Quit", True, WHITE)
-        instructions_rect = instructions_text.get_rect(center=(self.screen.get_width()//2, self.screen.get_height()//2 + 20))
-        self.screen.blit(instructions_text, instructions_rect)
-
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        popup.render(self.screen, self.button_manager)
 
     def draw_next_piece(self, piece):
         color = COLORS[piece.color]

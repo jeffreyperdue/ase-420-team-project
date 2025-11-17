@@ -52,6 +52,14 @@ paginate: true
 
 ---
 
+### Owens's Goals ✅
+- ✅ Integrate difficulty levels with scoring system (Anna's feature)
+- ✅ Polish ghost piece visual effects
+- ✅ Test level progression edge cases
+- ✅ Ensure smooth integration with existing game mechanics
+
+---
+
 ## Statistics Overview
 
 ### Lines of Code Added

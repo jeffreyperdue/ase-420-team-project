@@ -269,7 +269,7 @@ GAME_OVER = "game_over"
 ### Requirement Completion Rate
 - **Week 6**: 5/37 (14%)
 - **Week 7**: 12/37 (32%)
-- **Week 8**: 22/37 total requirements (59%)
+- **Week 8**: 22/37 total requirements (76%)
 
 
 ### Velocity Analysis

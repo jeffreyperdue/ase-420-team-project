@@ -20,7 +20,7 @@ class Game:
         self.level = 1
         self.lines_cleared = 0
         self.base_gravity_delay = 30
-        self.gravity_delay = self.base_gravity_delay  # frames between auto-fall
+        self.gravity_delay = self._calculate_gravity_delay()
         
     def start_new_game(self):
         """Initialize a new game."""
@@ -34,7 +34,7 @@ class Game:
         self.gravity_timer = 0
         self.level = 1
         self.lines_cleared = 0
-        self.gravity_delay = self.base_gravity_delay
+        self.gravity_delay = self._calculate_gravity_delay()
 
     @property
     def score(self):

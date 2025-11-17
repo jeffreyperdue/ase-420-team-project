@@ -24,3 +24,7 @@ class ButtonManager:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
+    def clear(self):
+        """Remove all managed buttons."""
+        self.buttons = []

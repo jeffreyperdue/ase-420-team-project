@@ -94,6 +94,10 @@ def main():
         if game.paused:
             renderer.draw_pause_screen()
         
+            # Pass current score and session high score to the renderer so the
+            # game over popup can display them.
+            renderer.draw_game_over_screen(score=game.score, high_score=game.high_score)
+            
         # Refresh display
         pygame.display.flip()
         

@@ -11,10 +11,8 @@ class InputHandler:
             pygame.K_DOWN: "DOWN",
             pygame.K_SPACE: "DROP",
             pygame.K_RETURN: "START",
-            # ESC will be handled specially to emit both QUIT and PAUSE intents
-            pygame.K_ESCAPE: "QUIT",
-            pygame.K_r: "RESTART",  # Add restart key
-            # Add 'p' key for pause toggle
+            pygame.K_ESCAPE: "QUIT", # ESC will be handled specially to emit both QUIT and PAUSE intents
+            pygame.K_r: "RESTART",
             pygame.K_p: "PAUSE",
         }
 

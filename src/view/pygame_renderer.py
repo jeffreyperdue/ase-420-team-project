@@ -6,6 +6,14 @@ from src.ui.pop_up import Popup
 
 class PygameRenderer:
     def __init__(self, screen, board_origin=(70, 60), next_piece_preview_origin=(110, 60)):
+        """
+        Initialize the PygameRenderer.
+
+        Args:
+            screen (pygame.Surface): The main display surface.
+            board_origin (tuple): Top-left pixel coordinates for the board grid.
+            next_piece_preview_origin (tuple): Top-left pixel coordinates for the next piece preview box.
+        """
         self.screen = screen
         self.board_x, self.board_y = board_origin
         self.next_piece_preview_x, self.next_piece_preview_y = next_piece_preview_origin
@@ -14,6 +22,16 @@ class PygameRenderer:
         self.button_manager = ButtonManager()
 
     def _scale_by_height(self, image, target_height):
+        """
+        Scale an image proportionally to a target height.
+
+        Args:
+            image (pygame.Surface): The image to scale.
+            target_height (int): Desired height in pixels.
+
+        Returns:
+            pygame.Surface: Scaled image surface.
+        """
         original_width, original_height = image.get_size()
         scale_factor = target_height / original_height
         scaled_width = int(original_width * scale_factor)
@@ -21,6 +39,12 @@ class PygameRenderer:
         return scaled_image
 
     def draw_board(self, board):
+        """
+        Render the game board grid and filled cells.
+
+        Args:
+            board (Board): The game board object containing cell states and colors.
+        """
         self.screen.fill(WHITE)
 
         for row in range(board.height):
@@ -46,7 +70,12 @@ class PygameRenderer:
                         )
 
     def draw_next_piece_preview(self, next_piece):
-        
+        """
+        Draw the preview box and label for the next piece.
+
+        Args:
+            next_piece (Piece): The upcoming piece to render in the preview box.
+        """
         pygame.draw.rect(self.screen, BLACK, NEXT_PAGE_PREVIEW_RECT, 1)
         font = pygame.font.SysFont('Arial', 20)
 
@@ -58,6 +87,12 @@ class PygameRenderer:
         self.draw_next_piece(next_piece)
 
     def draw_piece(self, piece):
+        """
+        Render the currently falling piece on the board.
+
+        Args:
+            piece (Piece): The active piece with position, rotation, and color.
+        """
         color = COLORS[piece.color]
         shape = SHAPES[piece.type][piece.rotation]
     
@@ -76,14 +111,14 @@ class PygameRenderer:
             pygame.draw.rect(self.screen, color, rect)
 
     def draw_score(self, score, high_score, font_size=24, color=BLACK):
-        """Render the current score and high score on screen.
-        Positions scores relative to the game board.
+        """
+        Render the current score and high score beside the board.
 
         Args:
-            score (int): The current score to display.
-            high_score (int): The high score to display.
-            font_size (int): Size of the font.
-            color (tuple): RGB color of the text.
+            score (int): Current score.
+            high_score (int): Session high score.
+            font_size (int): Font size for text.
+            color (tuple): RGB color for text.
         """
         font = pygame.font.SysFont('Arial', font_size, bold=True)
         
@@ -102,11 +137,10 @@ class PygameRenderer:
         self.screen.blit(high_score_text, high_score_pos)
 
     def draw_start_screen(self):
-        """Draw the start screen."""
-        """Draw the start screen using the Popup helper."""
-        # Build body lines describing controls (we'll use images plus text)
+        """Render the start screen popup with controls image and start/exit buttons."""
+        # Build body lines describing controls
         # To allow flexible height, we construct a Popup with title, images and body lines.
-        body_lines = [""]
+        body_lines = ["Press 'p' or 'ESC' at any time to pause."]
 
         # Compose images with small captions handled in body_lines for simplicity
         popup = Popup(
@@ -121,10 +155,13 @@ class PygameRenderer:
         popup.render(self.screen, self.button_manager)
 
     def draw_game_over_screen(self, score=None, high_score=None):
-        """Draw the game over popup using the Popup helper.
+        """
+        Render the game over popup with final score, high score,and two buttons:
+        Play Again (RESTART) and Quit (QUIT).
 
-        The popup will display the final score and session high score and
-        provide two buttons: Play Again (RESTART) and Quit (QUIT).
+        Args:
+            score (int, optional): Final score. Defaults to 0 if None.
+            high_score (int, optional): Session high score. Defaults to 0 if None.
         """
         # Compose body lines including the score info
         body_lines = ["You can try again or quit.", f"Score: {score if score is not None else 0}", f"High Score: {high_score if high_score is not None else 0}"]
@@ -140,6 +177,11 @@ class PygameRenderer:
         popup.render(self.screen, self.button_manager)
 
     def draw_next_piece(self, piece):
+        """ Render the next piece inside the preview box.
+
+        Args:
+            piece (Piece): The upcoming piece with type, rotation, and color.
+        """
         color = COLORS[piece.color]
         shape = SHAPES[piece.type][piece.rotation]
 
@@ -172,7 +214,7 @@ class PygameRenderer:
             pygame.draw.rect(self.screen, color, rect)
 
     def draw_pause_screen(self):
-        """Draw the pause screen overlay"""
+        """Render the pause overlay with 'PAUSED' text and resume instructions."""
         overlay = pygame.Surface(SCREEN_SIZE)
         overlay.set_alpha(180)
         overlay.fill((0, 0, 0))
@@ -191,8 +233,9 @@ class PygameRenderer:
         resume_text = font_small.render('Press P, ESC, or Click to Resume', True, WHITE)
         resume_rect = resume_text.get_rect(center=(center_x, center_y + 20))
         self.screen.blit(resume_text, resume_rect)
+
     def draw_level_info(self, level, lines_cleared, gravity_delay):
-        """Draw level, lines cleared, and gravity info for debugging.
+        """Render level, lines cleared, and gravity info.
         
         Args:
             level (int): Current level
@@ -215,7 +258,19 @@ class PygameRenderer:
 
     def draw_ghost_piece(self, board, piece):
         """
-        Draw a 'ghost' outline of the piece at its landing position.
+        Render a semi-transparent 'ghost' outline of the active piece
+        at its projected landing position.
+
+        The ghost piece shows players where the current piece will lock
+        if dropped straight down. It is drawn using a faded fill color
+        and an outline to distinguish it from active pieces.
+
+        Args:
+            board (Board): The game board, used to calculate the landing
+                position of the piece.
+            piece (Piece): The active piece whose ghost projection should
+                be rendered. Includes type, rotation, color, and current
+                x/y position.
         """
         shape = SHAPES[piece.type][piece.rotation]
         land_y = board.get_landing_y(piece)

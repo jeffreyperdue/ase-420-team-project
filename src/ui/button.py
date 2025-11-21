@@ -11,9 +11,11 @@ class Button:
         self.clicked = False
 
     def _darken(self, color, factor=0.8):
+        """Darken the given color by the specified factor."""
         return tuple(max(int(c * factor), 0) for c in color)
 
     def draw(self, screen, font):
+        """Draw the button on the given screen."""
         mouse_pos = pygame.mouse.get_pos()
         if self.clicked:
             current_color = self.click_color
@@ -28,7 +30,9 @@ class Button:
         screen.blit(text_surface, text_rect)
 
     def is_hovered(self, pos):
+        """Check if the button is hovered by the mouse position pos."""
         return self.rect.collidepoint(pos)
 
     def _brighten(self, color, factor=1.2):
+        """Brighten the given color by the specified factor."""
         return tuple(min(int(c * factor), 255) for c in color)

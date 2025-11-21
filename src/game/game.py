@@ -7,11 +7,14 @@ class Game:
         self.spawn_piece = spawn_piece_func
         self.current_piece = None
         self.next_piece = None
-        self.done = False
-        self.game_over = False  # Add game over state
-        self.paused = False
         self.gravity_timer = 0
-        # Scoring/session (HEAD)
+
+        # Game states
+        self.done = False
+        self.game_over = False
+        self.paused = False
+        
+        # Scoring/session
         self._score = 0
         self._session = session  # Session manager dependency injection
         self._state = START_SCREEN

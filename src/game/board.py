@@ -1,4 +1,5 @@
-from src.utils.linked_list import LinkedList    # Import the LinkedList class to store Rows in sequence
+# Import the LinkedList class to store Rows in sequence
+from src.utils.linked_list import LinkedList
 
 # Import playing board/grid dimensions from src/constants.py
 from src.constants import HEIGHT, WIDTH
@@ -104,23 +105,21 @@ class Board:
         row_obj.set_bit(col, color)     # Set the bit at column index and store the color
 
     def clear_cell(self, row, col) -> None:
+        """Clear the cell at (row, col) to make it empty."""
         node = self._rows.get_node_at(row)
         node.value.clear_bit(col)
 
-    def clear_full_lines(self) -> int:  # Changed: added -> int
+    def clear_full_lines(self) -> int:
         """
         Remove all full rows from the board and insert empty rows
         at the top to maintain height.
         
         Returns:
-            int: Number of lines cleared  # ADD THIS
+            int: Number of lines cleared
         """
-        lines_cleared = 0  # ADD THIS LINE
+        lines_cleared = 0
         index = 0
-        # Iterate over the current number of rows in the linked list. Using
-        # self.height here is incorrect because deletions reduce the list
-        # length; iterating up to self.rows.length() keeps the loop within
-        # the present bounds.
+        # Iterate over the current number of rows in the linked list.
         while index < self.rows.length():
             row_obj = self.get_row_object(index)
             if row_obj.is_full():
@@ -136,9 +135,9 @@ class Board:
         for _ in range(missing_rows):
             self.rows.insert_top(self._row_factory())
         
-        return lines_cleared  # ADD THIS LINE at the end
+        return lines_cleared
 
-    # Cody's game mechanics methods - PRESERVED FROM CODY'S BRANCH
+    # Cody's game mechanics methods
     def grid_position_to_coords(self, position, x, y) -> tuple:
         """
         Convert the given grid position for the piece cell position into board coordinates,

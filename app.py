@@ -80,7 +80,7 @@ def main():
         if game._state == START_SCREEN:
             renderer.draw_start_screen()
         elif game._state == GAME_OVER:
-            renderer.draw_game_over_screen()
+            renderer.draw_game_over_screen(score=game.score, high_score=game.high_score)
         
         # Draw ghost piece if playing and not paused
         if game._state == PLAYING and game.current_piece and not game.paused:

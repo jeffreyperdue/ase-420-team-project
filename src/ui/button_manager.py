@@ -6,19 +6,23 @@ class ButtonManager:
         self.buttons = []
 
     def add_button(self, rect, label, action, color=(0, 200, 0), text_color=(255, 255, 255)):
+        """Add a button to be managed."""
         self.buttons.append(Button(rect, label, action, color, text_color))
 
     def draw(self, screen, font):
+        """Draw all managed buttons on the given screen."""
         for button in self.buttons:
             button.draw(screen, font)
 
     def handle_click(self, pos):
+        """Return the action of the button at pos, if any."""
         for button in self.buttons:
             if button.is_hovered(pos):
                 return button.action
         return None
 
     def set_cursor(self):
+        """Set the mouse cursor based on hover state over buttons."""
         mouse_pos = pygame.mouse.get_pos()
         if any(button.is_hovered(mouse_pos) for button in self.buttons):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)

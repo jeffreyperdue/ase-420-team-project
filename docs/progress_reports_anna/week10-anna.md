@@ -20,7 +20,7 @@
 
 - _Fulfills sub requirement 3.3_
 
-✅ Write unit tests for start screen transition logic.
+✅ Write unit tests for game-over detection and play again/quit flows.
 
 - _Fulfills sub requirement 3.4_
 
@@ -29,8 +29,8 @@
 ### Additional Work Completed
 
 ✅ Fixed minor bug: scores were always showing as 0 on the Game Over screen
-✅ Added and modified comments/docstrings
 ✅ Remove unused functions and images
+✅ Added and modified comments/docstrings
 
 ---
 

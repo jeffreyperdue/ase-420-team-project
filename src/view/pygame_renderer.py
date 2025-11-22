@@ -147,8 +147,8 @@ class PygameRenderer:
             title="Tetris",
             body_lines=body_lines,
             images=[self.controls_img],
-            buttons=[("Start Game", "START", (0, 200, 0)), ("Exit", "EXIT", (200, 0, 0))],
-            width=420,
+            button_specs=[("Start Game", "START", (0, 200, 0)), ("Exit", "EXIT", (200, 0, 0))],
+            popup_width=420,
             padding=24,
         )
 
@@ -169,8 +169,8 @@ class PygameRenderer:
         popup = Popup(
             title="GAME OVER",
             body_lines=body_lines,
-            buttons=[("Play Again", "RESTART", (0, 200, 0)), ("Quit", "QUIT", (200, 0, 0))],
-            width=360,
+            button_specs=[("Play Again", "RESTART", (0, 200, 0)), ("Quit", "QUIT", (200, 0, 0))],
+            popup_width=360,
             padding=20,
         )
 

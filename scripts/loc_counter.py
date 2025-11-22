@@ -30,6 +30,8 @@ for fp in sorted(files):
             continue
         if s.startswith('#'):
             continue
+        if s.startswith('"""'):
+            continue
         count += 1
     counts[fp] = count
     total += count

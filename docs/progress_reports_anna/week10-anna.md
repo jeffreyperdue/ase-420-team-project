@@ -29,7 +29,9 @@
 ### Additional Work Completed
 
 ✅ Fixed minor bug: scores were always showing as 0 on the Game Over screen
+
 ✅ Remove unused functions and images
+
 ✅ Added and modified comments/docstrings
 
 ---
@@ -42,7 +44,7 @@
     - `src\view\pygame_renderer.py`: 1
   - Tests:
     - `tests\test_game_over.py`: 401 (new)
-  - **Total**: 461
+  - **Total**: 403
 - **LoC** (entire codebase)
   - Source code:
     - `app.py`: 72

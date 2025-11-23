@@ -39,15 +39,19 @@ def main():
                 done = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
-                    for button in renderer.button_manager.buttons:
-                        if button.is_hovered(event.pos):
-                            button.clicked = True
+                    for manager in (renderer.button_manager, renderer.hud_button_manager):
+                        for button in manager.buttons:
+                            if button.is_hovered(event.pos):
+                                button.clicked = True
                     intent = renderer.button_manager.handle_click(event.pos)
+                    if not intent:
+                        intent = renderer.hud_button_manager.handle_click(event.pos)
                     if intent:
                         intents.append(intent)
             elif event.type == pygame.MOUSEBUTTONUP:
-                for button in renderer.button_manager.buttons:
-                    button.clicked = False
+                for manager in (renderer.button_manager, renderer.hud_button_manager):
+                    for button in manager.buttons:
+                        button.clicked = False
         
         # Add keyboard intents
         intents.extend(input_handler.get_intents(events))
@@ -76,12 +80,6 @@ def main():
                 renderer.draw_next_piece_preview(game.next_piece)
             renderer.draw_score(game.score, game.high_score)
 
-        # Draw overlays based on game state
-        if game._state == START_SCREEN:
-            renderer.draw_start_screen()
-        elif game._state == GAME_OVER:
-            renderer.draw_game_over_screen(score=game.score, high_score=game.high_score)
-        
         # Draw ghost piece if playing and not paused
         if game._state == PLAYING and game.current_piece and not game.paused:
             renderer.draw_ghost_piece(board, game.current_piece)
@@ -89,14 +87,20 @@ def main():
         # Draw level info if playing
         if game._state == PLAYING:
             renderer.draw_level_info(game.level, game.lines_cleared, game.gravity_delay)
-        
-        # Draw pause screen overlay if paused
-        if game.paused:
-            renderer.draw_pause_screen()
-        
-            # Pass current score and session high score to the renderer so the
-            # game over popup can display them.
+
+        # Draw overlays and HUD elements after core board rendering
+        if game._state == START_SCREEN:
+            renderer.draw_start_screen()
+            renderer.clear_hud_buttons()
+        elif game._state == GAME_OVER:
             renderer.draw_game_over_screen(score=game.score, high_score=game.high_score)
+            renderer.clear_hud_buttons()
+        elif game.paused:
+            renderer.draw_pause_popup(score=game.score, high_score=game.high_score)
+            renderer.clear_hud_buttons()
+        else:
+            renderer.clear_popup_buttons()
+            renderer.draw_pause_button()
             
         # Refresh display
         pygame.display.flip()

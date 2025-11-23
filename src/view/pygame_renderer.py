@@ -20,6 +20,8 @@ class PygameRenderer:
         self.controls_img = pygame.image.load("src/view/img/controls.png").convert_alpha()
         self.controls_img = self._scale_by_height(self.controls_img, 240)
         self.button_manager = ButtonManager()
+        self.hud_button_manager = ButtonManager()
+        self._hud_button_font = pygame.font.SysFont('Arial', 18, bold=True)
 
     def _scale_by_height(self, image, target_height):
         """
@@ -233,6 +235,65 @@ class PygameRenderer:
         resume_text = font_small.render('Press P, ESC, or Click to Resume', True, WHITE)
         resume_rect = resume_text.get_rect(center=(center_x, center_y + 20))
         self.screen.blit(resume_text, resume_rect)
+
+    def draw_pause_popup(self, score, high_score):
+        """Render a modal pause popup with resume, restart, and exit options."""
+        self.hud_button_manager.clear()
+
+        body_lines = [
+            "Game paused.",
+            f"Score: {score}",
+            f"High Score: {high_score}",
+            "Resume to keep playing or restart to try again.",
+        ]
+
+        popup = Popup(
+            title="Paused",
+            body_lines=body_lines,
+            button_specs=[
+                ("Resume", "RESUME", (34, 139, 34)),
+                ("Restart", "RESTART", (30, 144, 255)),
+                ("Quit", "EXIT", (200, 0, 0)),
+            ],
+            popup_width=360,
+            padding=24,
+        )
+
+        popup.render(self.screen, self.button_manager)
+
+    def draw_pause_button(self):
+        """Draw the in-game HUD pause button."""
+        self.hud_button_manager.clear()
+
+        button_width, button_height = 120, 40
+        padding = 20
+        button_rect = (
+            SCREEN_SIZE[0] - button_width - padding,
+            padding,
+            button_width,
+            button_height,
+        )
+
+        self.hud_button_manager.add_button(
+            rect=button_rect,
+            label="Pause",
+            action="PAUSE",
+            color=(30, 144, 255),
+            text_color=(255, 255, 255),
+        )
+
+        self.hud_button_manager.draw(self.screen, self._hud_button_font)
+        self.hud_button_manager.set_cursor()
+
+    def clear_hud_buttons(self):
+        """Clear HUD buttons to avoid stale interactions when overlays are active."""
+        if self.hud_button_manager.buttons:
+            self.hud_button_manager.clear()
+
+    def clear_popup_buttons(self):
+        """Clear popup buttons when returning to gameplay."""
+        if self.button_manager.buttons:
+            self.button_manager.clear()
 
     def draw_level_info(self, level, lines_cleared, gravity_delay):
         """Render level, lines cleared, and gravity info.

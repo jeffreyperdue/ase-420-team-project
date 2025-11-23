@@ -32,6 +32,7 @@ class Game:
         self.next_piece = self.spawn_piece()
         self.done = False
         self.game_over = False
+        self.paused = False
         self._score = 0
         self._state = PLAYING
         self.gravity_timer = 0
@@ -67,22 +68,33 @@ class Game:
             return
             
         # Game is in progress - handle gameplay inputs
+        pause_toggled = False
         for intent in intents:
             if intent == "PAUSE":
                 self.paused = not self.paused
-            elif intent == "CLICK" and self.paused:
+                pause_toggled = True
+            elif intent == "RESUME":
                 self.paused = False
-            elif not self.paused:
-                if intent == "LEFT":
-                    self._try_move(-1, 0)
-                elif intent == "RIGHT":
-                    self._try_move(1, 0)
-                elif intent == "DOWN" or intent == "SOFT_DOWN":
-                    self._try_move(0, 1)
-                elif intent == "ROTATE":
-                    self._try_rotate()
-                elif intent == "DROP":
-                    self._drop_piece()
+                continue
+            elif intent == "RESTART":
+                self.start_new_game()
+                pause_toggled = False
+                continue
+            elif intent == "CLICK" and self.paused and not pause_toggled:
+                self.paused = False
+                continue
+            if self.paused:
+                continue
+            if intent == "LEFT":
+                self._try_move(-1, 0)
+            elif intent == "RIGHT":
+                self._try_move(1, 0)
+            elif intent == "DOWN" or intent == "SOFT_DOWN":
+                self._try_move(0, 1)
+            elif intent == "ROTATE":
+                self._try_rotate()
+            elif intent == "DROP":
+                self._drop_piece()
 
     def _try_move(self, dx, dy):
         """Try a move/rotate → if collision, cancel it"""

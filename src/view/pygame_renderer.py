@@ -305,18 +305,19 @@ class PygameRenderer:
         """
         font = pygame.font.Font(None, 24)
         
-        # Level display
+        # Level display (top-left)
         level_text = font.render(f"Level: {level}", True, BLACK)
         self.screen.blit(level_text, (10, 10))
-        
-        # Lines cleared display
+
+        # Lines cleared display (under level)
         lines_text = font.render(f"Lines: {lines_cleared}", True, BLACK)
         self.screen.blit(lines_text, (10, 35))
-        
-        # Gravity delay display (for debugging)
-        gravity_text = font.render(f"Gravity: {gravity_delay} frames", True, BLACK)
-        self.screen.blit(gravity_text, (10, 60))
 
+        # Gravity delay display (top-right)
+        gravity_text = font.render(f"Gravity: {gravity_delay} frames", True, BLACK)
+        gravity_rect = gravity_text.get_rect()
+        gravity_rect.topright = (self.screen.get_width() - 10, 10)
+        self.screen.blit(gravity_text, gravity_rect)
     def draw_ghost_piece(self, board, piece):
         """
         Render a semi-transparent 'ghost' outline of the active piece

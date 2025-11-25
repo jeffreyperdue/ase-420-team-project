@@ -21,6 +21,7 @@ class Game:
         
         # Progression (Owen)
         self.level = 1
+        self.score = 0
         self.lines_cleared = 0
         self.base_gravity_delay = 30
         self.gravity_delay = self._calculate_gravity_delay()
@@ -176,9 +177,13 @@ class Game:
         Returns:
             int: Frames between auto-fall
         """
+        # How much faster (in frames) the gravity becomes per level
         speed_increase = 3
-        calculated_delay = max(1, self.base_gravity_delay - (self.level - 1) * speed_increase)
-        return calculated_delay
+        # Minimum delay (cap) to avoid zero/negative gravity timings
+        min_delay = 10
+        calculated_delay = self.base_gravity_delay - (self.level - 1) * speed_increase
+        # Enforce a floor so gravity never goes below `min_delay` frames
+        return max(min_delay, calculated_delay)
 
     def _update_level(self, lines_cleared_count: int) -> None:
         """Update level based on lines cleared.
@@ -192,3 +197,28 @@ class Game:
             if new_level > self.level:
                 self.level = new_level
                 self.gravity_delay = self._calculate_gravity_delay()
+
+            # Update score for the cleared lines using current level multiplier
+            self._add_score(lines_cleared_count)
+
+    def get_score_multiplier(self) -> float:
+        """Return the score multiplier based on current level.
+
+        Currently implemented as a simple linear multiplier: 1.0 at level 1,
+        increasing by 0.1 per level (so level 2 => 1.1, level 3 => 1.2, ...).
+        """
+        return 1.0 + (self.level - 1) * 0.1
+
+    def _add_score(self, lines_cleared_count: int) -> None:
+        """Add score for a lines clear event, applying a multiplier based on the
+        number of lines cleared and the current level.
+
+        Uses a small base table for line clear rewards and applies the level
+        multiplier so that scoring scales with difficulty.
+        """
+        # Base points for clearing 1,2,3,4 lines (similar to classic Tetris-ish values)
+        base_points = {1: 40, 2: 100, 3: 300, 4: 1200}
+        base = base_points.get(lines_cleared_count, 50 * lines_cleared_count)
+        gained = int(base * self.get_score_multiplier())
+        self.score += gained
+

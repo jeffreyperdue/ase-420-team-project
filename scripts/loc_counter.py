@@ -6,6 +6,12 @@ import os
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 paths = [os.path.join(ROOT, 'src'), os.path.join(ROOT, 'tests')]
 files = []
+
+for f in os.listdir(ROOT):
+    full_path = os.path.join(ROOT, f)
+    if os.path.isfile(full_path) and f.endswith('.py'):
+        files.append(full_path)
+
 for p in paths:
     for dirpath, dirnames, filenames in os.walk(p):
         for f in filenames:
@@ -23,6 +29,8 @@ for fp in sorted(files):
         if s == '':
             continue
         if s.startswith('#'):
+            continue
+        if s.startswith('"""'):
             continue
         count += 1
     counts[fp] = count

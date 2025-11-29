@@ -124,8 +124,17 @@ class Game:
         print("freeze piece")
         # Update score and level if lines cleared
         if lines_cleared > 0:
+            # First apply base scoring
             self._update_score(lines_cleared)
+            # Then update progression which may add additional scoring
             self._update_level(lines_cleared)
+            # Now update session high score once after all scoring for this
+            # clear has been applied to avoid gaps where high score lags
+            # behind due to additional points added in _update_level
+            try:
+                self._session.update_high_score(self._score)
+            except Exception:
+                pass
         self._spawn_new_piece()  # spawn new piece (private)
 
     def _drop_piece(self):
@@ -167,8 +176,6 @@ class Game:
         """
         if not self._state == GAME_OVER:
             self._score += points_for_clear(lines_cleared)
-            # Update session high score if current score is higher
-            self._session.update_high_score(self._score)
 
     def _calculate_gravity_delay(self) -> int:
         """Calculate gravity delay based on current level.

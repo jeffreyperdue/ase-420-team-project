@@ -21,7 +21,7 @@ class Game:
         
         # Progression (Owen)
         self.level = 1
-        self.score = 0
+        # self.score = 0
         self.lines_cleared = 0
         self.base_gravity_delay = 30
         self.gravity_delay = self._calculate_gravity_delay()
@@ -220,5 +220,5 @@ class Game:
         base_points = {1: 40, 2: 100, 3: 300, 4: 1200}
         base = base_points.get(lines_cleared_count, 50 * lines_cleared_count)
         gained = int(base * self.get_score_multiplier())
-        self.score += gained
+        self._score += gained
 

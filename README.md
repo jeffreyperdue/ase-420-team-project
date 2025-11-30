@@ -2,17 +2,10 @@
 
 # GitHub io page located at https://jeffreyperdue.github.io/ase-420-team-project/
 
----
-marp: true
-size: 4:3
-paginate: true
-theme: default
----
 
 # Tetris Game
 ## User Guide
 
-**Version:** 1.0  
 **Welcome to Tetris!** This guide will help you get started and master the game.
 
 ---

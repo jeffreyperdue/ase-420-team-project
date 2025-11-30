@@ -316,7 +316,7 @@ class PygameRenderer:
         # Gravity delay display (top-right)
         gravity_text = font.render(f"Gravity: {gravity_delay} frames", True, BLACK)
         gravity_rect = gravity_text.get_rect()
-        gravity_rect.topright = (self.screen.get_width() - 10, 10)
+        gravity_rect.topright = (self.screen.get_width() - 10, 70)
         self.screen.blit(gravity_text, gravity_rect)
     def draw_ghost_piece(self, board, piece):
         """

@@ -1,0 +1,24 @@
+baseURL = "https://jeffreyperdue.github.io/ase-420-team-project/"
+languageCode = "en-us"
+title = "ASE 420 Team Project - Tetris Game"
+theme = "project-theme"
+
+[params]
+githubRepo = "https://github.com/jeffreyperdue/ase-420-team-project"
+description = "A fully functional Tetris game implementation demonstrating object-oriented design principles, clean architecture, and comprehensive testing strategies."
+
+[[menu.main]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "Documentation"
+url = "/documentation/"
+weight = 2
+
+[[menu.main]]
+name = "About"
+url = "/about/"
+weight = 3
+

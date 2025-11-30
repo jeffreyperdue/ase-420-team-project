@@ -21,6 +21,7 @@ from src.game.game import Game
 from src.game.board import Board
 from src.game.piece import Piece
 from src.game.row import Row
+from src.utils.session_manager import SessionManager
 from src.constants import WIDTH, HEIGHT
 
 
@@ -52,11 +53,13 @@ class TestPauseAndPreviewIntegration(unittest.TestCase):
     
     def setUp(self):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
+        self.session = SessionManager()
     
     def test_next_piece_visible_then_pause(self):
         """Next piece should remain visible after pausing."""
         spawn = create_spawn_sequence([(0, 1), (1, 2), (2, 3)])
-        game = Game(self.board, spawn)
+        game = Game(self.board, spawn, self.session)
+        game.start_new_game()  # Initialize pieces
         
         # Get initial pieces
         current_before = game.current_piece
@@ -72,7 +75,8 @@ class TestPauseAndPreviewIntegration(unittest.TestCase):
     def test_next_piece_advances_after_pause_and_drop(self):
         """Piece advancement should work normally after resuming."""
         spawn = create_spawn_sequence([(0, 1), (1, 2), (2, 3), (3, 4)])
-        game = Game(self.board, spawn)
+        game = Game(self.board, spawn, self.session)
+        game.start_new_game()  # Initialize pieces
         
         p1 = game.current_piece
         p2 = game.next_piece
@@ -90,7 +94,8 @@ class TestPauseAndPreviewIntegration(unittest.TestCase):
     def test_pause_during_piece_progression(self):
         """Pausing should not interfere with piece progression after resume."""
         spawn = create_spawn_sequence([(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)])
-        game = Game(self.board, spawn)
+        game = Game(self.board, spawn, self.session)
+        game.start_new_game()  # Initialize pieces
         
         # Drop first piece
         game.apply(["DROP"])
@@ -117,7 +122,8 @@ class TestPauseAndPreviewIntegration(unittest.TestCase):
         spawn = create_spawn_sequence([
             (0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7)
         ])
-        game = Game(self.board, spawn)
+        game = Game(self.board, spawn, self.session)
+        game.start_new_game()  # Initialize pieces
         
         piece_sequence = [game.current_piece]
         
@@ -141,8 +147,10 @@ class TestPauseWithGameStateComplexity(unittest.TestCase):
     
     def setUp(self):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
+        self.session = SessionManager()
         spawn = create_spawn_sequence([(0, 1), (1, 2), (2, 3)])
-        self.game = Game(self.board, spawn)
+        self.game = Game(self.board, spawn, self.session)
+        self.game.start_new_game()  # Initialize pieces
     
     def test_pause_preserves_piece_position_and_gravity(self):
         """Pausing should preserve exact piece position and gravity state."""
@@ -209,11 +217,13 @@ class TestPreviewStabilityWithComplexMovements(unittest.TestCase):
     
     def setUp(self):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
+        self.session = SessionManager()
     
     def test_preview_stable_through_various_movements(self):
         """Preview should not change during movement sequences."""
         spawn = create_spawn_sequence([(0, 1), (1, 2), (2, 3)])
-        game = Game(self.board, spawn)
+        game = Game(self.board, spawn, self.session)
+        game.start_new_game()  # Initialize pieces
         
         next_piece_id = id(game.next_piece)
         
@@ -233,7 +243,8 @@ class TestPreviewStabilityWithComplexMovements(unittest.TestCase):
     def test_preview_updates_only_on_lock(self):
         """Preview should only change when current piece locks."""
         spawn = create_spawn_sequence([(0, 1), (1, 2), (2, 3), (3, 4)])
-        game = Game(self.board, spawn)
+        game = Game(self.board, spawn, self.session)
+        game.start_new_game()  # Initialize pieces
         
         next_piece_before = game.next_piece
         
@@ -254,8 +265,10 @@ class TestPauseInputHandlingEdgeCases(unittest.TestCase):
     
     def setUp(self):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
+        self.session = SessionManager()
         spawn = create_spawn_sequence([(0, 1), (1, 2), (2, 3)])
-        self.game = Game(self.board, spawn)
+        self.game = Game(self.board, spawn, self.session)
+        self.game.start_new_game()  # Initialize pieces
     
     def test_pause_with_multiple_movement_intents_in_same_frame(self):
         """Multiple movement intents when paused should all be blocked."""

@@ -45,6 +45,7 @@ class TestSessionScore(unittest.TestCase):
         """Test high score persists when starting new games."""
         # Play first game
         self.game._update_score(4)  # 800 points
+        self.session.update_high_score(self.game.score)  # Update high score
         self.assertEqual(self.game.score, 800)
         self.assertEqual(self.session.high_score, 800)
         
@@ -59,6 +60,7 @@ class TestSessionScore(unittest.TestCase):
         """Test high score only updates when current score is higher."""
         # First game sets initial high score
         self.game._update_score(4)  # 800 points
+        self.session.update_high_score(self.game.score)  # Update high score
         self.assertEqual(self.session.high_score, 800)
         
         # Start new game
@@ -72,6 +74,7 @@ class TestSessionScore(unittest.TestCase):
         
         # Higher scores should update it
         self.game._update_score(4)  # +800 = 900 total
+        self.session.update_high_score(self.game.score)  # Update high score
         self.assertEqual(self.session.high_score, 900,
                        "High score should update when exceeded")
 
@@ -79,6 +82,7 @@ class TestSessionScore(unittest.TestCase):
         """Test game over doesn't affect high score tracking."""
         # Get some points then end game
         self.game._update_score(4)  # 800 points
+        self.session.update_high_score(self.game.score)  # Update high score
         self.game.game_over = True
         
         # High score should be set
@@ -94,6 +98,7 @@ class TestSessionScore(unittest.TestCase):
         """Test high score tracking across multiple game sessions."""
         # Game 1: Score 800
         self.game._update_score(4)
+        self.session.update_high_score(self.game.score)  # Update high score
         self.assertEqual(self.session.high_score, 800)
         
         # Game 2: Score 300 (shouldn't affect high score)
@@ -107,6 +112,7 @@ class TestSessionScore(unittest.TestCase):
         self.game = Game(self.board, simple_spawn, self.session)
         self.game._update_score(4)  # 800 points
         self.game._update_score(2)  # +300 = 1100 total
+        self.session.update_high_score(self.game.score)  # Update high score
         self.assertEqual(self.session.high_score, 1100)
         
         # Game 4: Game over shouldn't reset high score

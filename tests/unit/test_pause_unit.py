@@ -21,6 +21,7 @@ from src.game.game import Game
 from src.game.board import Board
 from src.game.piece import Piece
 from src.game.row import Row
+from src.utils.session_manager import SessionManager
 from src.constants import WIDTH, HEIGHT
 
 
@@ -31,7 +32,9 @@ class TestPauseStateManagement(unittest.TestCase):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pause works
     
     def test_initial_pause_state_is_false(self):
         """Game should start unpaused."""
@@ -81,7 +84,9 @@ class TestMovementWhenPaused(unittest.TestCase):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pause works
     
     def test_left_movement_blocked_when_paused(self):
         """LEFT intent should be ignored when paused."""
@@ -144,7 +149,9 @@ class TestGravityWhenPaused(unittest.TestCase):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pause works
     
     def test_gravity_timer_not_incremented_when_paused(self):
         """Gravity timer should not increment while paused."""
@@ -181,7 +188,9 @@ class TestPauseEdgeCases(unittest.TestCase):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pause works
     
     def test_multiple_intents_with_pause_in_middle(self):
         """Multiple intents should respect pause state changes."""

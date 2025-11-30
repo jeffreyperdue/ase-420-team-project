@@ -19,7 +19,8 @@ if repo_root not in sys.path:
   sys.path.insert(0, repo_root)
 
 from src.game.board import Board
-from src.constants import HEIGHT, WIDTH, TEAL
+from src.game.piece import Piece
+from src.constants import HEIGHT, WIDTH
 
 
 def simple_row_factory():
@@ -51,7 +52,7 @@ class TestBoardEdgeCases(unittest.TestCase):
   def setUp(self):
     from src.game.row import Row
     self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
-    self.color = TEAL
+    self.color = 1  # Use integer color value for testing
 
   def test_boundary_index_access(self):
     with self.assertRaises(IndexError):
@@ -99,7 +100,7 @@ class TestBoardEdgeCases(unittest.TestCase):
     self.assertEqual(self.board.height, HEIGHT)
 
   def test_color_preservation(self):
-    self.board.set_cell(3, 4, TEAL)
+    self.board.set_cell(3, 4, self.color)
     self.assertTrue(self.board.get_cell(3, 4))
 
   def test_multiple_clears_in_succession(self):

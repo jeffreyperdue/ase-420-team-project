@@ -7,11 +7,12 @@ repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
 
-from utils.score import points_for_clear
+from src.utils.score import points_for_clear
 from src.game.game import Game
 from src.game.board import Board
 from src.game.row import Row
 from src.game.piece import Piece
+from src.utils.session_manager import SessionManager
 from src.constants import WIDTH
 
 
@@ -27,7 +28,8 @@ class TestScoreUtils(unittest.TestCase):
 
     def test_game_uses_score_helper(self):
         board = Board(lambda: Row(WIDTH), height=20, width=WIDTH)
-        game = Game(board, simple_spawn)
+        session = SessionManager()
+        game = Game(board, simple_spawn, session)
         # Sanity: game._update_score should produce identical effect as calling helper
         game._score = 0
         for lines in (0, 1, 2, 3, 4):

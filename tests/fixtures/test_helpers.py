@@ -18,6 +18,7 @@ from src.game.game import Game
 from src.game.board import Board
 from src.game.piece import Piece
 from src.game.row import Row
+from src.utils.session_manager import SessionManager
 from src.constants import WIDTH, HEIGHT
 
 
@@ -406,7 +407,8 @@ def create_test_game(board=None):
     def spawn_piece():
         return Piece(WIDTH // 2, 0)
     
-    return Game(board, spawn_piece)
+    session = SessionManager()
+    return Game(board, spawn_piece, session)
 
 
 def create_test_piece(x=None, y=None, piece_type=0, color=1):

@@ -14,6 +14,7 @@ from src.game.board import Board
 from src.game.piece import Piece
 from src.game.row import Row
 from src.view.input import InputHandler
+from src.utils.session_manager import SessionManager
 from src.constants import WIDTH, HEIGHT
 
 
@@ -22,7 +23,9 @@ class TestPauseToggle(unittest.TestCase):
         self.board = Board(lambda: Row(WIDTH), height=HEIGHT, width=WIDTH)
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pause works
         self.input_handler = InputHandler()
 
     def test_pause_with_p_key(self):

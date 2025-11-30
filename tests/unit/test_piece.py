@@ -71,8 +71,17 @@ class TestPiece(unittest.TestCase):
         self.assertEqual(piece.x, initial_x)
         
         # Test wall collision (move left until wall)
+        # Move left multiple times - piece should stop at x=0 (left wall)
+        initial_x = piece.x
         for _ in range(10):  # More than board width
+            old_x = piece.x
             self.board.go_side(-1, piece)
+            # If we hit the wall, x should stop at 0
+            if piece.x == 0:
+                break
+            # Piece should not go backwards (collision should revert)
+            self.assertLessEqual(piece.x, old_x)
+        # After all moves, piece should be at x=0 or greater
         self.assertGreaterEqual(piece.x, 0)  # Should not go past left wall
 
     @patch('src.game.piece.random.randint')

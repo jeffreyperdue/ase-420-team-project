@@ -25,6 +25,7 @@ from src.game.board import Board
 from src.game.piece import Piece
 from src.game.row import Row
 from src.view.input import InputHandler
+from src.utils.session_manager import SessionManager
 from src.constants import WIDTH, HEIGHT
 
 
@@ -39,7 +40,9 @@ class TestInputGameIntegration(unittest.TestCase):
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
         
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pieces are initialized
         self.input_handler = InputHandler()
 
     def test_keyboard_input_translates_to_game_actions(self):
@@ -249,7 +252,9 @@ class TestInputGameEdgeCases(unittest.TestCase):
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
         
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pieces are initialized
         self.input_handler = InputHandler()
 
     def test_rapid_key_presses(self):

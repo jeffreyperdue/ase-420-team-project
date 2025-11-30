@@ -1,0 +1,82 @@
+{{ define "main" }}
+<section class="hero">
+    <div class="hero-content">
+        <h1>ASE 420 Team Project</h1>
+        <h2>Tetris Game</h2>
+        <p class="hero-description">A fully functional Tetris game implementation demonstrating object-oriented design principles, clean architecture with separation of concerns, and comprehensive testing strategies.</p>
+        <div class="hero-buttons">
+            <a href="{{ absURL "documentation/" }}" class="btn btn-primary">View Documentation</a>
+            <a href="{{ .Site.Params.githubRepo }}" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <h2>Project Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Clean Architecture</h3>
+                <p>Layered architecture with clear separation between game logic, rendering, and UI components.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Comprehensive Testing</h3>
+                <p>411 test cases covering unit, integration, acceptance, and regression testing strategies.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Design Patterns</h3>
+                <p>Implementation of Factory, Singleton, Strategy, and State Machine patterns for maintainable code.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Optimized Data Structures</h3>
+                <p>Custom LinkedList and bitmask-based row representation for efficient game operations.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Intent-Based Communication</h3>
+                <p>Decoupled input system using string intents for flexible and testable command processing.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Modern UI</h3>
+                <p>Responsive popup system with button management and smooth user interactions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="tech-stack">
+    <div class="container">
+        <h2>Technology Stack</h2>
+        <div class="tech-items">
+            <span class="tech-badge">Python 3.x</span>
+            <span class="tech-badge">Pygame</span>
+            <span class="tech-badge">pytest</span>
+            <span class="tech-badge">Object-Oriented Design</span>
+        </div>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="container">
+        <h2>Project Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">1,200</div>
+                <div class="stat-label">Lines of Source Code</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5,677</div>
+                <div class="stat-label">Lines of Test Code</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">411</div>
+                <div class="stat-label">Test Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Major Subsystems</div>
+            </div>
+        </div>
+    </div>
+</section>
+{{ end }}
+

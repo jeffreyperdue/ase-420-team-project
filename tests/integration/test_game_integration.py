@@ -23,6 +23,7 @@ from src.game.game import Game
 from src.game.board import Board
 from src.game.piece import Piece
 from src.game.row import Row
+from src.utils.session_manager import SessionManager
 from src.constants import WIDTH, HEIGHT
 
 
@@ -39,7 +40,9 @@ class TestGameBoardIntegration(unittest.TestCase):
             return Piece(WIDTH // 2, 0)
         
         # Create game instance
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
+        self.game.start_new_game()  # Start game so pieces are initialized
 
     def test_game_initialization_with_board(self):
         """Test that game initializes correctly with board."""
@@ -147,23 +150,37 @@ class TestGameBoardIntegration(unittest.TestCase):
 
     def test_game_over_condition_integration(self):
         """Test game over condition through integration."""
-        # Create a board with pieces at the top
-        for col in range(WIDTH):
-            self.board.set_cell(0, col, 1)
-        
         # Create a new piece that would collide at spawn
         def spawn_collision_piece():
             return Piece(WIDTH // 2, 0)
+
+        session = SessionManager()
+        collision_game = Game(self.board, spawn_collision_piece, session)
+        collision_game.start_new_game()  # Initialize pieces (this clears the board!)
         
-        collision_game = Game(self.board, spawn_collision_piece)
-        
+        # Fill board AFTER start_new_game() since it clears the board
+        # Fill rows 0-3 completely to ensure piece at spawn collides
+        # Piece type 0, rotation 0 places cells at (x+1, y), (x+1, y+1), (x+1, y+2), (x+1, y+3)
+        # At x=WIDTH//2=5, this is (6, 0), (6, 1), (6, 2), (6, 3)
+        for row in range(0, 4):  # Fill rows 0-3
+            for col in range(WIDTH):
+                collision_game.board.set_cell(row, col, 1)
+
         # NOTE: Game over screen is not implemented in Sprint 1, so we test collision detection instead
         # Check if the piece would collide at spawn position
-        collision_detected = collision_game.board.will_piece_collide(collision_game.current_piece)
-        
+        # Use the current_piece from the game, which should have the correct type and rotation
+        test_piece = collision_game.current_piece
+        # Ensure piece has type and rotation set (will_piece_collide needs these)
+        test_piece.type = 0  # Use a simple piece type
+        test_piece.rotation = 0
+        # Reset position to spawn position
+        test_piece.x = WIDTH // 2
+        test_piece.y = 0
+        collision_detected = collision_game.board.will_piece_collide(test_piece)
+
         # Verify collision detection works (game over screen will be implemented in Sprint 2)
-        # For now, we just verify the collision detection system is working
-        self.assertIsInstance(collision_detected, bool)
+        # Since we filled rows 0-3, a piece at spawn (y=0) extending to row 3 should collide
+        self.assertTrue(collision_detected, f"Piece at ({test_piece.x}, {test_piece.y}) with type {test_piece.type}, rotation {test_piece.rotation} should collide with filled rows 0-3")
         
         # Verify the board is properly filled near the top
         filled_cells = 0
@@ -239,10 +256,12 @@ class TestGameBoardEdgeCases(unittest.TestCase):
         def spawn_piece():
             return Piece(WIDTH // 2, 0)
         
-        self.game = Game(self.board, spawn_piece)
+        self.session = SessionManager()
+        self.game = Game(self.board, spawn_piece, self.session)
 
     def test_boundary_movement_integration(self):
         """Test piece movement at board boundaries."""
+        self.game.start_new_game()  # Initialize pieces
         piece = self.game.current_piece
         
         # Move to left boundary (limit iterations)
@@ -266,6 +285,7 @@ class TestGameBoardEdgeCases(unittest.TestCase):
 
     def test_rapid_input_handling(self):
         """Test that rapid input is handled correctly."""
+        self.game.start_new_game()  # Initialize pieces
         piece = self.game.current_piece
         
         # Apply rapid input (reduced iterations to prevent issues)

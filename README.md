@@ -2,6 +2,7 @@
 
 # GitHub io page located at https://jeffreyperdue.github.io/ase-420-team-project/
 
+# Full Demo Video can be found here: https://youtu.be/kQTY8RHE-6Q
 
 # Tetris Game
 ## User Guide

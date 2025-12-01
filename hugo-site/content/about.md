@@ -17,7 +17,8 @@ This is the ASE 420 Team Project - a fully functional Tetris game implementation
 - Anna Dinius
 - Cody King
 - Owen Newberry
-
+- Jeffrey Perdue
+  
 ## Technology Stack
 
 - **Language**: Python 3.x

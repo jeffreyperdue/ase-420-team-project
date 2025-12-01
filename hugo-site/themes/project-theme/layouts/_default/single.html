@@ -1,0 +1,16 @@
+{{ define "main" }}
+<div class="single-page">
+    <div class="container">
+        <article>
+            <h1>{{ .Title }}</h1>
+            <div class="content">
+                {{ .Content }}
+            </div>
+        </article>
+        <div class="return-home">
+            <a href="{{ .Site.BaseURL }}" class="btn btn-primary">Return to Home</a>
+        </div>
+    </div>
+</div>
+{{ end }}
+
